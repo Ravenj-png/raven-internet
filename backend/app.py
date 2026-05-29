@@ -15,6 +15,8 @@ from logging.handlers import RotatingFileHandler
 def create_app(config_class=Config):
     app = Flask(__name__); app.config.from_object(config_class)
     db.init_app(app); migrate.init_app(app, db); limiter.init_app(app); jwt.init_app(app)
+    with app.app_context():
+        db.create_all()
     CORS(app, origins=app.config['ALLOWED_ORIGINS'], supports_credentials=True)
     if not app.debug: Talisman(app, force_https=True, session_cookie_secure=True)
     WireGuardService(app); PaymentService(app)
