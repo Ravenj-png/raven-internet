@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raven Student - Buy Internet</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    :root { --bg: #0f172a; --card: #1e293b; --primary: #3b82f6; --success: #10b981; --text: #f8fafc; --text-muted: #94a3b8; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
+    .container { max-width: 480px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; margin-bottom: 6px; }
+    .header p { color: var(--text-muted); font-size: 14px; }
+    .card { background: var(--card); border: 1px solid #334155; border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .card h3 { color: var(--primary); font-size: 14px; text-transform: uppercase; margin-bottom: 14px; }
+    .input { width: 100%; padding: 14px; background: var(--bg); border: 1px solid #334155; border-radius: 10px; color: var(--text); font-size: 15px; margin-bottom: 12px; }
+    .input:focus { outline: none; border-color: var(--primary); }
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: var(--primary); color: white; }
+    .plan { background: var(--bg); border: 2px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .plan:hover { border-color: var(--primary); }
+    .plan.active { border-color: var(--success); background: #064e3b; }
+    .plan-info h4 { margin-bottom: 6px; }
+    .tags { display: flex; gap: 6px; }
+    .tag { background: var(--card); color: var(--text-muted); padding: 4px 10px; border-radius: 20px; font-size: 11px; }
+    .price { color: var(--success); font-size: 20px; font-weight: bold; }
+    .voucher-display { text-align: center; padding: 20px; background: #064e3b; border-radius: 12px; margin: 16px 0; }
+    .voucher-code { font-size: 28px; font-weight: bold; letter-spacing: 2px; margin: 10px 0; color: white; font-family: monospace; }
+    .apk-download { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #334155; }
+    .apk-btn { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+    .footer { text-align: center; color: var(--text-muted); margin-top: 24px; font-size: 12px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header"><h1>🦅 Raven Student</h1><p>Fast Internet • Pay Daily • Works Anywhere</p></div>
+    <div class="card"><h3>📱 Your Phone Number</h3><input type="tel" class="input" id="phoneInput" placeholder="07XX XXX XXX" maxlength="10"></div>
+    <div class="card">
+      <h3> Select a Plan</h3>
+      <div class="plan" onclick="selectPlan('daily', 950, this)"><div class="plan-info"><h4>Daily 1GB</h4><div class="tags"><span class="tag">24 HRS</span><span class="tag">1 GB</span></div></div><div class="price">UGX 950</div></div>
+      <div class="plan" onclick="selectPlan('weekly', 6500, this)"><div class="plan-info"><h4>Weekly 7GB</h4><div class="tags"><span class="tag">7 DAYS</span><span class="tag">7 GB</span></div></div><div class="price">UGX 6,500</div></div>
+      <button class="btn btn-primary" id="payBtn" onclick="initiatePayment()" disabled>💳 Pay with Airtel Money</button>
+    </div>
+    <div class="card hidden" id="voucherCard">
+      <h3>✅ Payment Successful</h3>
+      <div class="voucher-display"><div style="color:var(--text-muted); font-size:14px;">Your Access Code</div><div class="voucher-code" id="voucherCode">RVN-XXXXXXX</div><div style="color:var(--text-muted); font-size:13px;">Valid for 24 hours • 1024 MB</div></div>
+      <p style="color:var(--text-muted); font-size:13px; text-align:center;">Code also sent to <strong id="phoneDisplay">07XX XXX XXX</strong> via SMS</p>
+      <div class="apk-download"><p style="margin-bottom:12px; color:var(--text-muted);">🔌 Need to connect? Download the Raven VPN app:</p><a href="https://your-apk-host.com/raven-vpn-v1.0.apk" class="apk-btn" target="_blank">📲 Download Raven VPN</a></div>
+    </div>
+    <div class="footer">© 2026 Raven Student • PWA • Works Offline</div>
+  </div>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+    const API_BASE = window.RAVEN_API_URL || (location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.ravenstudent.com');
+    let selectedPlan = null, selectedAmount = 0;
+    function selectPlan(id, amount, el) {
+      document.querySelectorAll('.plan').forEach(p => p.classList.remove('active'));
+      el.classList.add('active'); selectedPlan = id; selectedAmount = amount;
+      document.getElementById('payBtn').disabled = false;
+    }
+    async function initiatePayment() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      if (!phone || phone.length < 10) return alert('Enter valid phone number');
+      if (!selectedPlan) return alert('Select a plan first');
+      const btn = document.getElementById('payBtn'); btn.disabled = true; btn.textContent = 'Processing...';
+      try {
+        const res = await fetch(`${API_BASE}/api/plans/purchase`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone_number: phone, plan_id: selectedPlan, amount: selectedAmount}) });
+        const data = await res.json();
+        if (data.success) window.location.href = data.checkout_url;
+        else { alert('Payment failed: ' + data.message); btn.disabled = false; btn.textContent = '💳 Pay with Airtel Money'; }
+      } catch (err) { alert('Connection error. Try again.'); btn.disabled = false; btn.textContent = '💳 Pay with Airtel Money'; }
+    }
+    function onPaymentSuccess(voucherCode, phone) {
+      document.getElementById('voucherCard').classList.remove('hidden');
+      document.getElementById('voucherCode').textContent = voucherCode;
+      document.getElementById('phoneDisplay').textContent = phone;
+      document.getElementById('voucherCard').scrollIntoView({behavior: 'smooth'});
+      navigator.clipboard?.writeText(voucherCode);
+    }
+  </script>
+</body>
+</html>
