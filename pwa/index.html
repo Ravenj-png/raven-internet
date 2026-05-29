@@ -55,7 +55,7 @@
   </div>
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
-    const API_BASE = window.RAVEN_API_URL || (location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.ravenstudent.com');
+    const API_BASE = window.RAVEN_API_URL || (location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://raven-internet.onrender.com');
     let selectedPlan = null, selectedAmount = 0;
     function selectPlan(id, amount, el) {
       document.querySelectorAll('.plan').forEach(p => p.classList.remove('active'));
