@@ -52,7 +52,7 @@
     </div>
     
     <div class="header">
-      <h1>🦅 Raven Student</h1>
+      <h1>🦅 Raven Internet</h1>
       <p>Fast Internet • Pay Daily • Works Anywhere</p>
     </div>
     
@@ -89,10 +89,14 @@
       </div>
       <p style="color:var(--text-muted); font-size:13px; text-align:center;">Code also sent to <strong id="phoneDisplay">07XX XXX XXX</strong> via SMS</p>
       <div class="apk-download">
-        <p style="margin-bottom:8px; color:var(--text-muted);">🔌 Need to connect?</p>
-        <a href="#" id="apkDownloadLink" class="apk-btn" target="_blank">📲 Download Raven VPN App</a>
-        <p style="margin-top:10px; font-size:11px; color:#666;">Install app → Enter code → Connect & Browse</p>
-      </div>
+  <p>🔌 Need to connect? Download the Raven VPN app:</p>
+  <a href="https://github.com/Ravenj-png/raven-internet/releases/download/v1.0.0/app-release.apk" 
+     class="apk-btn" 
+     target="_blank">
+    📲 Download Raven VPN
+  </a>
+  <p style="margin-top:10px; font-size:11px; color:#666;">Install app → Enter code → Connect & Browse</p>
+</div>
     </div>
     
     <div class="footer">© 2026 Raven Student • Install App for VPN Access</div>
@@ -227,10 +231,7 @@
         voucherCard.classList.remove('hidden');
         showToast('✅ Payment successful! Use code to connect.');
         
-        // Update APK download link
-        const apkLink = document.getElementById('apkDownloadLink');
-        apkLink.href = '#';
-        apkLink.textContent = '📲 Coming Soon - Build APK';
+        // Apk link sent to html no need to over ride
         
         // Clear session storage
         sessionStorage.removeItem('raven_phone');
