@@ -1,5 +1,4 @@
 from librouteros import connect
-from librouteros.exceptions import RouterOsApiException
 from flask import current_app
 import socket
 
@@ -26,21 +25,32 @@ class MikroTikService:
         try:
             self.conn = connect(host=self.host, username=self.user, password=self.pw, encoding='utf-8', port=8728, timeout=10)
             return self.conn
-        except RouterOsApiException as e:
-            current_app.logger.error(f"MT fail: {e}")
-            raise
         except socket.timeout:
-            current_app.logger.error("MT timeout")
+            current_app.logger.error("MikroTik connection timeout")
+            raise
+        except Exception as e:
+            current_app.logger.error(f"MikroTik connection failed: {e}")
             raise
     
     def add_peer(self, pub, ip, code, speed):
         try:
             api = self._connect()
-            api.path('interface', 'wireguard', 'peers').add(interface='wg0', public_key=pub, allowed_address=f'{ip}/32', comment=code, persistent_keepalive='25')
-            api.path('queue', 'simple').add(name=f'q-{code}', target=ip, max_limit=f'{speed}M/{speed}M', comment=f'{code}')
+            api.path('interface', 'wireguard', 'peers').add(
+                interface='wg0',
+                public_key=pub,
+                allowed_address=f'{ip}/32',
+                comment=code,
+                persistent_keepalive='25'
+            )
+            api.path('queue', 'simple').add(
+                name=f'q-{code}',
+                target=ip,
+                max_limit=f'{speed}M/{speed}M',
+                comment=f'{code}'
+            )
             return True
         except Exception as e:
-            current_app.logger.error(f"MT add: {e}")
+            current_app.logger.error(f"MikroTik add peer failed: {e}")
             return False
     
     def remove_peer(self, code):
@@ -56,7 +66,7 @@ class MikroTikService:
                     break
             return True
         except Exception as e:
-            current_app.logger.error(f"MT rem: {e}")
+            current_app.logger.error(f"MikroTik remove peer failed: {e}")
             return False
     
     def health_check(self):
