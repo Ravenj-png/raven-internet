@@ -24,7 +24,7 @@ def create_app():
     jwt.init_app(app)
     
     # Enable CORS
-    CORS(app, origins=app.config.get('ALLOWED_ORIGINS', ['*']))
+    CORS(app, origins=app.config.get('ALLOWED_ORIGINS', ['*']), supports_credentials=true, methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allow_headers=['Content-Type', 'Authorization', 'X-Admin-Token'])
     
     # Security headers (disable for local dev)
     if not app.debug:
