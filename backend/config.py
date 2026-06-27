@@ -8,11 +8,12 @@ class Config:
     WG_SIGNING_PRIVATE_KEY_PEM=os.environ.get('WG_SIGNING_PRIVATE_KEY_PEM')
     WG_SERVER_PUBLIC_KEY=os.environ.get('WG_SERVER_PUBLIC_KEY')
     PESAPAL_CONSUMER_KEY=os.environ.get('PESAPAL_CONSUMER_KEY')
+    PESAPAL_ENVIRONMENT=os.environ.get('
     PESAPAL_CONSUMER_SECRET=os.environ.get('PESAPAL_CONSUMER_SECRET')
     PESAPAL_IPN_URL=os.environ.get('PESAPAL_IPN_URL')
     YOOLA_SMS_API_KEY=os.environ.get('YOOLA_SMS_API_KEY')
     YOOLA_SMS_SENDER_ID=os.environ.get('YOOLA_SMS_SENDER_ID','RavenVPN')
-    YOOLA_SMS_BASE_URL=os.environ.get('YOOLA_SMS_BASE_URL','https://api.yoola.com/v1')
+    YOOLA_SMS_BASE_URL=os.environ.get('YOOLA_SMS_BASE_URL','https://yoolasms.com/api/v1/send.php')
     MIKROTIK_HOST=os.environ.get('MIKROTIK_HOST')
     MIKROTIK_USERNAME=os.environ.get('MIKROTIK_USERNAME','admin')
     MIKROTIK_PASSWORD=os.environ.get('MIKROTIK_PASSWORD')
