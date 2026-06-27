@@ -1,4 +1,4 @@
- import re
+import re
 
 def validate_phone(phone):
     # Fixed: Changed {9} to {8} to match 12-digit international numbers
