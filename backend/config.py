@@ -2,6 +2,7 @@ import os
 class Config:
     SECRET_KEY=os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL')
+    ALLOWED_ORIGINS=['https://ravenj-png.github.io','https://raven-internet.onrender.com']
     SQLALCHEMY_TRACK_MODIFICATIONS=False
     JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
     PHONE_HASH_SECRET=os.environ.get('PHONE_HASH_SECRET')
