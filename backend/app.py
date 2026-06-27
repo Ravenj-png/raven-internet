@@ -22,6 +22,12 @@ from logging.handlers import RotatingFileHandler
 def create_app():
     app = Flask(__name__); app.config.from_object(Config)
     db.init_app(app); migrate.init_app(app, db); limiter.init_app(app); jwt.init_app(app)
+    with app:app_context():
+        try:
+            db.create_all()
+            print("Database tables created successfully")
+        except Exception as e:
+            print(f"Table creation note: {e}")
     CORS(app, origins=app.config['ALLOWED_ORIGINS'])
     if not app.debug: Talisman(app, force_https=True, session_cookie_secure=True, frame_options='DENY')
     WireGuardService(app); PaymentService(app); MikroTikService(app); SMSService(app)
