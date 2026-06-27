@@ -47,4 +47,8 @@ def create_app():
     fh.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
     app.logger.addHandler(fh); app.logger.setLevel(logging.INFO); return app
 app = create_app()
+with app:app_context():
+    from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog
+    db.create_all()
+    print("Database tables verified")
 if __name__=='__main__': app.run(host='0.0.0.0', port=5000)
