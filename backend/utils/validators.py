@@ -1,7 +1,6 @@
-import re
+import re, secrets, string
 
 def validate_phone(phone):
-    # Fixed: Changed {9} to {8} to match 12-digit international numbers
     return bool(re.match(r'^(07[0-9]{8}|2567[0-9]{8}|2547[0-9]{8}|2557[0-9]{8})$', phone))
 
 def validate_voucher_code(code):
@@ -9,3 +8,10 @@ def validate_voucher_code(code):
 
 def sanitize_input(text):
     return text.strip()[:255] if text else ''
+
+def generate_voucher_code():
+    suffix = ''.join(
+        secrets.choice(string.ascii_uppercase + string.digits)
+        for _ in range(7)
+    )
+    return f"RVN-{suffix}"
