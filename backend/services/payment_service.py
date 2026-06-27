@@ -36,9 +36,18 @@ class PaymentService:
             self._token = d.get('token')
             self._exp = time.time() + 82800
             return self._token
+
+
+        except requests.HTTPError as e:
+            current_app.logger.error(f"Status: {e.response.status_code}")
+            current_app.logger.error(f"Response: {e.response.text}")
+            raise
         except Exception as e:
             current_app.logger.error(f"Pesapal token fail: {e}")
             raise
+        #except Exception as e:
+         #   current_app.logger.error(f"Pesapal token fail: {e}")
+          #  raise
 
     def initiate_payment(self, phone, amount, ref, plan_id):
         try:
