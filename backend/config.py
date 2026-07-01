@@ -1,41 +1,37 @@
-import os
+import os, socket
+
 class Config:
-    SECRET_KEY=os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL')
-    ALLOWED_ORIGINS=['https://ravenj-png.github.io','https://raven-internet.onrender.com']
-    SQLALCHEMY_TRACK_MODIFICATIONS=False
-    JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY')
-    PHONE_HASH_SECRET=os.environ.get('PHONE_HASH_SECRET')
-    WG_SIGNING_PRIVATE_KEY_PEM=os.environ.get('WG_SIGNING_PRIVATE_KEY_PEM')
-    WG_SERVER_PUBLIC_KEY=os.environ.get('WG_SERVER_PUBLIC_KEY')
-    PESAPAL_CONSUMER_KEY=os.environ.get('PESAPAL_CONSUMER_KEY')
-    PESAPAL_ENVIRONMENT=os.environ.get('PESAPAL_ENVIRONMENT','cybqa')
-    PESAPAL_CONSUMER_SECRET=os.environ.get('PESAPAL_CONSUMER_SECRET')
-    PESAPAL_IPN_URL=os.environ.get('PESAPAL_IPN_URL')
-    YOOLA_SMS_API_KEY=os.environ.get('YOOLA_SMS_API_KEY')
-    YOOLA_SMS_SENDER_ID=os.environ.get('YOOLA_SMS_SENDER_ID','RavenVPN')
-    YOOLA_SMS_BASE_URL=os.environ.get('YOOLA_SMS_BASE_URL','https://yoolasms.com/api/v1/send.php')
-    MIKROTIK_HOST=os.environ.get('MIKROTIK_HOST')
-    MIKROTIK_USERNAME=os.environ.get('MIKROTIK_USERNAME','admin')
-    MIKROTIK_PASSWORD=os.environ.get('MIKROTIK_PASSWORD')
-    MIKROTIK_WG_PORT=int(os.environ.get('MIKROTIK_WG_PORT','51820'))
-    MIKROTIK_PUBLIC_IP=os.environ.get('MIKROTIK_PUBLIC_IP')
-    ALLOWED_ORIGINS=[o.strip() for o in os.environ.get('ALLOWED_ORIGINS','').split(',') if o.strip()]
-    RATELIMIT_STORAGE_URL=os.environ.get('RATELIMIT_STORAGE_URL','memory://')
-
-
-import socket
-
-DUMMY_PASSWORD = os.environ.get('DUMMY_PASSWORD')  # For test mode fallback
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    ALLOWED_ORIGINS = [o.strip() for o in os.environ.get('ALLOWED_ORIGINS', 'https://ravenj-png.github.io,https://raven-internet.onrender.com').split(',') if o.strip()]
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
+    PHONE_HASH_SECRET = os.environ.get('PHONE_HASH_SECRET')
+    WG_SIGNING_PRIVATE_KEY_PEM = os.environ.get('WG_SIGNING_PRIVATE_KEY_PEM')
+    WG_SERVER_PUBLIC_KEY = os.environ.get('WG_SERVER_PUBLIC_KEY')
+    PESAPAL_CONSUMER_KEY = os.environ.get('PESAPAL_CONSUMER_KEY')
+    PESAPAL_ENVIRONMENT = os.environ.get('PESAPAL_ENVIRONMENT', 'cybqa')
+    PESAPAL_CONSUMER_SECRET = os.environ.get('PESAPAL_CONSUMER_SECRET')
+    PESAPAL_IPN_URL = os.environ.get('PESAPAL_IPN_URL')
+    YOOLA_SMS_API_KEY = os.environ.get('YOOLA_SMS_API_KEY')
+    YOOLA_SMS_SENDER_ID = os.environ.get('YOOLA_SMS_SENDER_ID', 'RavenVPN')
+    YOOLA_SMS_BASE_URL = os.environ.get('YOOLA_SMS_BASE_URL', 'https://yoolasms.com/api/v1/send.php')
+    MIKROTIK_HOST = os.environ.get('MIKROTIK_HOST')
+    MIKROTIK_USERNAME = os.environ.get('MIKROTIK_USERNAME', 'admin')
+    MIKROTIK_PASSWORD = os.environ.get('MIKROTIK_PASSWORD')
+    MIKROTIK_WG_PORT = int(os.environ.get('MIKROTIK_WG_PORT', '51820'))
+    MIKROTIK_PUBLIC_IP = os.environ.get('MIKROTIK_PUBLIC_IP')
+    RATELIMIT_STORAGE_URL = os.environ.get('RATELIMIT_STORAGE_URL', 'memory://')
+    DUMMY_PASSWORD = os.environ.get('DUMMY_PASSWORD')  # For test mode fallback
 
 def is_router_online():
     """Ping MikroTik API port to detect if router is reachable"""
-    if not MIKROTIK_HOST:
+    if not Config.MIKROTIK_HOST:  # ✅ FIXED: Use Config. prefix
         return False
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)  # 3 second timeout
-        result = sock.connect_ex((MIKROTIK_HOST, MIKROTIK_WG_PORT))  # Use your WG port or 8728 for API
+        sock.settimeout(3)
+        result = sock.connect_ex((Config.MIKROTIK_HOST, Config.MIKROTIK_WG_PORT))
         sock.close()
         return result == 0
     except:
@@ -43,5 +39,5 @@ def is_router_online():
 
 def is_test_mode():
     """Auto-detect test vs live mode based on env state"""
-    # Test mode if: no router host OR dummy password exists OR router unreachable
-    return not MIKROTIK_HOST or DUMMY_PASSWORD is not None or not is_router_online()
+    # ✅ FIXED: Use Config. prefix for all config vars
+    return not Config.MIKROTIK_HOST or Config.DUMMY_PASSWORD is not None or not is_router_online()
