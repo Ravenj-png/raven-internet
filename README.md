@@ -47,9 +47,3 @@ Raven uses a **server-side environment detector**. No code changes are needed to
 |------|-------------------|----------|
 | 🟡 **TEST MODE** | `MIKROTIK_HOST` is empty OR `DUMMY_PASSWORD` exists OR router is unreachable | • Skips Pesapal → instant mock success<br>• Generates `TEST-XXXXXXX` vouchers<br>• SMS logged only (not sent)<br>• Admin shows 🟡 TEST MODE & disables real controls |
 |  **LIVE MODE** | `MIKROTIK_HOST` is set + router responds on port 8728 + `DUMMY_PASSWORD` removed | • Real Pesapal payments<br>• Real `RVN-XXXXXXX` vouchers<br>• Real Yoola SMS & MikroTik provisioning<br>• Full admin controls active |
-
->  **You do NOT need to edit `.env` to toggle modes.** The backend reads your current state on every request and locks in automatically.
-
----
-
-## 🗂️ Project Structure
