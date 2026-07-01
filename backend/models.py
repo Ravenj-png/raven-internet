@@ -1,12 +1,12 @@
 from extensions import db
 import datetime as dt
-from sqlalchemy import Index, or_
+from sqlalchemy import Index
 
 class Student(db.Model):
     __tablename__ = 'students'
     id = db.Column(db.Integer, primary_key=True)
     phone_hash = db.Column(db.String(64), unique=True, nullable=False)
-    phone_display = db.Column(db.String(20)) # Last 4 digits for UI
+    phone_display = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     is_blocked = db.Column(db.Boolean, default=False)
 
@@ -36,18 +36,12 @@ class Transaction(db.Model):
     phone_number = db.Column(db.String(20), nullable=False)
     plan_id = db.Column(db.String(50), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
-    
-    # ✅ HARDENED STATE MACHINE
-    status = db.Column(db.String(20), default='PENDING') 
-    # States: PENDING, SUCCESS, FAILED, PENDING_REVIEW
-    
+    status = db.Column(db.String(20), default='PENDING')
     voucher_code = db.Column(db.String(20))
     idempotency_key = db.Column(db.String(100), unique=True, nullable=True)
-    merchant_reference = db.Column(db.String(100), unique=True, nullable=True) # For Webhooks
+    merchant_reference = db.Column(db.String(100), unique=True, nullable=True)
     is_test = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
-    
-    # ✅ INDEXES FOR SPEED & LOCKS
     __table_args__ = (
         Index('idx_tx_idem', 'idempotency_key'),
         Index('idx_tx_merchant_ref', 'merchant_reference'),
@@ -63,7 +57,6 @@ class Voucher(db.Model):
     expires_at = db.Column(db.DateTime)
     is_test = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
-    
     __table_args__ = (
         Index('idx_voucher_code', 'code'),
         Index('idx_voucher_is_test', 'is_test'),
@@ -103,8 +96,8 @@ class VisitorLog(db.Model):
 class AuditLog(db.Model):
     __tablename__ = 'audit_logs'
     id = db.Column(db.Integer, primary_key=True)
-    action = db.Column(db.String(50)) # purchase_test, purchase_live, webhook_update
+    action = db.Column(db.String(50))
     phone = db.Column(db.String(20))
     plan_id = db.Column(db.String(50))
-    metadata = db.Column(db.JSON) # Stores extra details like status, error msg
+    extra_data = db.Column(db.JSON)  # ✅ FIXED: Renamed from 'metadata' (reserved word)
     timestamp = db.Column(db.DateTime, default=dt.datetime.utcnow)
