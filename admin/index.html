@@ -3,56 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🦅 Raven Admin</title>
+  <title>🦅 Raven NetOps VPN Admin</title>
   <style>
-    :root { --bg: #0b1120; --card: #1e293b; --primary: #3b82f6; --success: #10b981; --text: #f8fafc; --text-muted: #94a3b8; --border: #334155; --warning: #f59e0b; --danger: #ef4444; }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-    .header h1 { font-size: 24px; }
-    .header button { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
-    .login { max-width: 400px; margin: 100px auto; text-align: center; }
-    .login input { width: 100%; padding: 14px; margin: 12px 0; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: white; }
-    .login button { width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 32px; }
-    .stat-card { background: var(--card); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
-    .stat-card h3 { color: var(--text-muted); font-size: 13px; margin-bottom: 8px; }
-    .stat-card .value { font-size: 24px; font-weight: bold; }
-    .value.green { color: var(--success); } .value.blue { color: var(--primary); } .value.yellow { color: var(--warning); } .value.red { color: var(--danger); }
-    .section { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
-    .section h3 { margin-bottom: 16px; color: var(--text-muted); font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
-    .section h3 button { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
-    th { color: var(--text-muted); font-weight: 500; }
-    .status { padding: 4px 10px; border-radius: 20px; font-size: 12px; }
-    .status.success { background: #064e3b; color: var(--success); } .status.pending { background: #78350f; color: var(--warning); } .status.failed { background: #450a0a; color: var(--danger); }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; margin-bottom: 6px; font-size: 14px; color: var(--text-muted); }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: white; }
-    .hidden { display: none !important; }
-    .action-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-    .action-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; min-width: 140px; }
-    .btn-warning { background: var(--warning); color: #0b1120; }
-    .btn-primary { background: var(--primary); color: white; }
-    @media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } table { font-size: 12px; } th, td { padding: 8px; } }
+    :root{--bg:#0b1120;--card:#1e293b;--primary:#3b82f6;--success:#10b981;--text:#f8fafc;--text-muted:#94a3b8;--border:#334155;--warning:#f59e0b;--danger:#ef4444;}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif}
+    body{background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+    .container{max-width:1200px;margin:0 auto}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .header h1{font-size:24px}
+    .mode-badge{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold;background:#334155;color:#94a3b8}
+    .header button{background:var(--danger);color:white;border:none;padding:8px 16px;border-radius:8px;cursor:pointer}
+    .login{max-width:400px;margin:100px auto;text-align:center}
+    .login input{width:100%;padding:14px;margin:12px 0;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:white}
+    .login button{width:100%;padding:14px;background:var(--primary);border:none;border-radius:10px;color:white;font-weight:600;cursor:pointer}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:32px}
+    .stat-card{background:var(--card);padding:20px;border-radius:12px;text-align:center;border:1px solid var(--border)}
+    .stat-card h3{color:var(--text-muted);font-size:13px;margin-bottom:8px}
+    .stat-card .value{font-size:24px;font-weight:bold}
+    .value.green{color:var(--success)}.value.blue{color:var(--primary)}.value.yellow{color:var(--warning)}.value.red{color:var(--danger)}
+    .section{background:var(--card);border-radius:12px;padding:20px;margin-bottom:20px;border:1px solid var(--border)}
+    .section h3{margin-bottom:16px;color:var(--text-muted);font-size:16px;display:flex;justify-content:space-between;align-items:center}
+    .section h3 button{background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border);font-size:14px}
+    th{color:var(--text-muted);font-weight:500}
+    .status{padding:4px 10px;border-radius:20px;font-size:12px}
+    .status.success{background:#064e3b;color:var(--success)}.status.pending{background:#78350f;color:var(--warning)}.status.failed{background:#450a0a;color:var(--danger)}
+    .form-group{margin-bottom:12px}
+    .form-group label{display:block;margin-bottom:6px;font-size:14px;color:var(--text-muted)}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:white}
+    .hidden{display:none!important}
+    .action-bar{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+    .action-btn{flex:1;padding:12px;border:none;border-radius:8px;cursor:pointer;font-weight:600;min-width:140px}
+    .btn-warning{background:var(--warning);color:#0b1120}
+    .btn-primary{background:var(--primary);color:white}
+    .dormant-overlay{text-align:center;padding:40px;color:var(--text-muted);background:rgba(245,158,11,0.05);border-radius:12px;border:1px dashed var(--warning)}
+    @media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}table{font-size:12px}th,td{padding:8px}}
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- LOGIN -->
     <div id="loginScreen" class="login">
-      <h1>🦅 Raven Admin</h1>
-      <p style="color: var(--text-muted); margin: 16px 0;">Enter your admin token</p>
+      <h1>🦅 Raven NetOps VPN Admin</h1>
+      <p style="color:var(--text-muted);margin:16px 0">Enter your admin token</p>
       <input type="password" id="adminToken" placeholder="Token">
       <button onclick="login()">Access Dashboard</button>
-      <p id="loginError" style="color: var(--danger); margin-top: 12px; display: none;"></p>    </div>
+      <p id="loginError" style="color:var(--danger);margin-top:12px;display:none"></p>
+    </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboard" class="hidden">
-      <div class="header"><h1> Raven VPN Admin</h1><button onclick="logout()">Logout</button></div>
-      <div class="stats">
+      <div class="header">
+        <h1>Raven NetOps VPN Admin</h1>
+        <div class="mode-badge" id="modeBadge">🟡 TEST MODE</div>
+        <button onclick="logout()">Logout</button>
+      </div>
+      
+      <div class="stats" id="statsGrid">
         <div class="stat-card"><h3>Active</h3><div class="value green" id="activeUsers">-</div></div>
         <div class="stat-card"><h3>Total</h3><div class="value blue" id="totalUsers">-</div></div>
         <div class="stat-card"><h3>Today Rev</h3><div class="value" id="todayRevenue">-</div></div>
@@ -62,7 +68,7 @@
         <div class="stat-card"><h3>Failed Pay</h3><div class="value red" id="failedPayments">-</div></div>
       </div>
 
-      <div class="action-bar">
+      <div class="action-bar" id="actionBar">
         <button class="action-btn btn-warning" onclick="sendReminders()">🔔 Send Renewals</button>
         <button class="action-btn btn-primary" onclick="loadAnalytics()">📊 Load Analytics</button>
       </div>
@@ -77,7 +83,7 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section" id="newsSection">
         <h3>📢 Broadcast News <button onclick="toggleNewsForm()">+ New</button></h3>
         <div id="newsForm" class="hidden" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
           <div class="form-group"><label>Title</label><input type="text" id="newsTitle"></div>
@@ -88,7 +94,7 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section" id="voucherSection">
         <h3>🎫 Manual Voucher <button onclick="toggleVoucherForm()">+ New</button></h3>
         <div id="voucherForm" class="hidden" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
           <div class="form-group"><label>Phone</label><input type="tel" id="voucherPhone" placeholder="2567..."></div>
@@ -96,7 +102,8 @@
             <select id="voucherPlan">
               <optgroup label="Standard"><option value="daily_basic">Daily Basic</option><option value="monthly_premium">Monthly Premium</option></optgroup>
               <optgroup label="PRO"><option value="pro_2m_30gb">PRO 30GB</option><option value="pro_2m_60gb">PRO 60GB</option></optgroup>
-              <optgroup label="Annual"><option value="annual_250gb">Annual 250GB</option><option value="annual_unlimited">Annual Unlimited</option></optgroup>            </select>
+              <optgroup label="Annual"><option value="annual_250gb">Annual 250GB</option><option value="annual_unlimited">Annual Unlimited</option></optgroup>
+            </select>
           </div>
           <div class="form-group hidden" id="txnGroup"><label>Transaction ID</label><input type="text" id="txnId" placeholder="PES-XXXXXX"></div>
           <div class="form-group hidden" id="payCheckGroup">
@@ -107,125 +114,147 @@
         </div>
       </div>
 
-      <div class="section"><h3>💰 Transactions <button onclick="loadTransactions()">↻ Refresh</button></h3>
+      <div class="section" id="txSection"><h3>💰 Transactions <button onclick="loadTransactions()">↻ Refresh</button></h3>
         <table><thead><tr><th>Ref</th><th>Phone</th><th>Amount</th><th>Status</th></tr></thead><tbody id="txTable"><tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Loading...</td></tr></tbody></table>
       </div>
-      <div class="section"><h3> Live Users <button onclick="loadLiveUsers()"> Refresh</button></h3>
+      <div class="section" id="liveSection"><h3>🟢 Live Users <button onclick="loadLiveUsers()">↻ Refresh</button></h3>
         <table><thead><tr><th>Phone</th><th>Speed</th><th>Used</th><th>Expires</th><th>Action</th></tr></thead><tbody id="liveTable"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Loading...</td></tr></tbody></table>
       </div>
     </div>
   </div>
 
-  <script>
-    const API_BASE = 'https://raven-internet.onrender.com';
-    let adminToken = localStorage.getItem('raven_admin_token');
+<script>
+const API_BASE = 'https://raven-internet.onrender.com';
+let adminToken = localStorage.getItem('raven_admin_token');
+let currentMode = 'test';
 
-    function login() {
-      const token = document.getElementById('adminToken').value.trim();
-      if (!token) return alert('Enter admin token');
-      localStorage.setItem('raven_admin_token', token);
-      adminToken = token;
-      loadDashboard();
+function login() {
+  const token = document.getElementById('adminToken').value.trim();
+  if (!token) return alert('Enter admin token');
+  localStorage.setItem('raven_admin_token', token);
+  adminToken = token;
+  loadDashboard();
+}
+
+function logout() {
+  localStorage.removeItem('raven_admin_token');
+  adminToken = null;
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('adminToken').value = '';
+}
+
+async function loadDashboard() {
+  if (!adminToken) return logout();
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/stats`, { headers: { 'X-Admin-Token': adminToken } });
+    if (res.status === 401) throw new Error('Invalid token. Access denied.');
+    if (!res.ok) throw new Error('Network error');
+    const d = await res.json();
+    currentMode = d.mode || 'test';
+    
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    
+    const badge = document.getElementById('modeBadge');
+    if (currentMode === 'TEST' || currentMode === 'TEST MODE') {
+      badge.textContent = '🟡 TEST MODE'; badge.style.background = '#f59e0b22'; badge.style.color = '#f59e0b';
+      document.getElementById('statsGrid').innerHTML = `<div class="dormant-overlay" style="grid-column:1/-1">🟡 TEST MODE<br>Real controls & data are dormant.<br>Use PWA to simulate flows.</div>`;
+      document.getElementById('actionBar').style.display = 'none';
+      document.getElementById('newsSection').style.display = 'none';
+      document.getElementById('voucherSection').style.display = 'none';
+      document.getElementById('txSection').style.display = 'none';
+      document.getElementById('liveSection').style.display = 'none';
+    } else {
+      badge.textContent = '🟢 LIVE'; badge.style.background = '#10b98122'; badge.style.color = '#10b981';
+      document.getElementById('activeUsers').textContent = d.active_users || 0;
+      document.getElementById('totalUsers').textContent = d.total_users || 0;
+      document.getElementById('todayRevenue').textContent = `UGX ${(d.today_revenue||0).toLocaleString()}`;
+      document.getElementById('weekRevenue').textContent = `UGX ${(d.week_revenue||0).toLocaleString()}`;
+      document.getElementById('vouchersUsed').textContent = d.vouchers_used || 0;
+      document.getElementById('pendingVouchers').textContent = d.vouchers_pending || 0;
+      document.getElementById('failedPayments').textContent = d.failed_payments || 0;
+      document.getElementById('actionBar').style.display = 'flex';
+      document.getElementById('newsSection').style.display = 'block';
+      document.getElementById('voucherSection').style.display = 'block';
+      document.getElementById('txSection').style.display = 'block';
+      document.getElementById('liveSection').style.display = 'block';
+      loadTransactions(); loadLiveUsers();
     }
+  } catch (e) { alert(e.message); logout(); }
+}
 
-    function logout() {
-      localStorage.removeItem('raven_admin_token');
-      adminToken = null;
-      document.getElementById('loginScreen').classList.remove('hidden');
-      document.getElementById('dashboard').classList.add('hidden');
-      document.getElementById('adminToken').value = '';
-    }
+async function loadTransactions() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/transactions`, { headers: { 'X-Admin-Token': adminToken } });
+    const t = await res.json();
+    document.getElementById('txTable').innerHTML = t.length ? t.map(x => `<tr><td>${x.tx_ref?.slice(-8)||'N/A'}</td><td>${x.phone}</td><td>UGX ${(x.amount||0).toLocaleString()}</td><td><span class="status ${x.status}">${x.status}</span></td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center">No transactions</td></tr>';
+  } catch(e) {}
+}
 
-    async function loadDashboard() {
-      if (!adminToken) return logout();
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/stats`, { headers: { 'X-Admin-Token': adminToken } });
-        if (res.status === 401) throw new Error('Invalid token. Access denied.');
-        if (!res.ok) throw new Error('Network error');
-        const d = await res.json();
-        document.getElementById('activeUsers').textContent = d.active_users || 0;
-        document.getElementById('totalUsers').textContent = d.total_users || 0;
-        document.getElementById('todayRevenue').textContent = `UGX ${(d.today_revenue||0).toLocaleString()}`;        document.getElementById('weekRevenue').textContent = `UGX ${(d.week_revenue||0).toLocaleString()}`;
-        document.getElementById('vouchersUsed').textContent = d.vouchers_used || 0;
-        document.getElementById('pendingVouchers').textContent = d.vouchers_pending || 0;
-        document.getElementById('failedPayments').textContent = d.failed_payments || 0;
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadTransactions(); loadLiveUsers();
-      } catch (e) { alert(e.message); logout(); }
-    }
+async function loadLiveUsers() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/live-users`, { headers: { 'X-Admin-Token': adminToken } });
+    const u = await res.json();
+    document.getElementById('liveTable').innerHTML = u.users?.length ? u.users.map(x => `<tr><td>${x.phone}</td><td>${x.plan_tier} Mbps</td><td>${x.data_used_mb} MB</td><td>${x.expires_at}</td><td><button style="background:var(--danger);color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px">Block</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center">No active users</td></tr>';
+  } catch(e) {}
+}
 
-    async function loadTransactions() {
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/transactions`, { headers: { 'X-Admin-Token': adminToken } });
-        const t = await res.json();
-        document.getElementById('txTable').innerHTML = t.length ? t.map(x => `<tr><td>${x.tx_ref.slice(-8)}</td><td>${x.phone}</td><td>UGX ${(x.amount||0).toLocaleString()}</td><td><span class="status ${x.status}">${x.status}</span></td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center">No transactions</td></tr>';
-      } catch(e) {}
-    }
+function toggleNewsForm() { document.getElementById('newsForm').classList.toggle('hidden'); }
+async function publishNews() {
+  const title = document.getElementById('newsTitle').value;
+  const msg = document.getElementById('newsMessage').value;
+  const pri = document.getElementById('newsPriority').value;
+  const resEl = document.getElementById('newsResult');
+  if (!title || !msg) return alert('Title & message required');
+  resEl.style.display = 'block'; resEl.textContent = 'Publishing...';
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/news`, { method:'POST', headers:{'Content-Type':'application/json','X-Admin-Token':adminToken}, body:JSON.stringify({title,message:msg,priority:parseInt(pri)}) });
+    const d = await res.json();
+    resEl.textContent = d.success ? '✅ Published' : '❌ Error';
+    if(d.success){document.getElementById('newsTitle').value='';document.getElementById('newsMessage').value='';}
+  } catch(e){ resEl.textContent=' Network error'; }
+}
 
-    async function loadLiveUsers() {
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/live-users`, { headers: { 'X-Admin-Token': adminToken } });
-        const u = await res.json();
-        document.getElementById('liveTable').innerHTML = u.users.length ? u.users.map(x => `<tr><td>${x.phone}</td><td>${x.plan_tier} Mbps</td><td>${x.data_used_mb} MB</td><td>${x.expires_at}</td><td><button style="background:var(--danger);color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px">Block</button></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center">No active users</td></tr>';
-      } catch(e) {}
-    }
+function toggleVoucherForm() { document.getElementById('voucherForm').classList.toggle('hidden'); }
+document.getElementById('voucherPlan')?.addEventListener('change', function() {
+  const v = this.value;
+  document.getElementById('txnGroup').classList.toggle('hidden', !(v.startsWith('annual')||v.startsWith('pro')));
+  document.getElementById('payCheckGroup').classList.toggle('hidden', !v.startsWith('annual'));
+  if(!v.startsWith('annual')) document.getElementById('paymentConfirmed').checked = true;
+});
+async function generateVoucher() {
+  const phone = document.getElementById('voucherPhone').value.trim();
+  const plan = document.getElementById('voucherPlan').value;
+  const confirmed = document.getElementById('paymentConfirmed')?.checked || true;
+  const txn = document.getElementById('txnId')?.value || '';
+  const resEl = document.getElementById('voucherResult');
+  if(!phone) return alert('Phone required');
+  resEl.style.display='block'; resEl.textContent='Generating...';
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/generate-voucher`, { method:'POST', headers:{'Content-Type':'application/json','X-Admin-Token':adminToken}, body:JSON.stringify({phone_number:phone,plan_id:plan,payment_confirmed:confirmed,txn_id:txn}) });
+    const d = await res.json();
+    resEl.innerHTML = d.success ? `✅ Code: <b>${d.voucher_code}</b><br>TXN: ${txn||'N/A'}<br>Expires: ${new Date(d.expires_at).toLocaleString()}` : `❌ ${d.error}`;
+  } catch(e){ resEl.textContent='❌ Network error'; }
+}
 
-    function toggleNewsForm() { document.getElementById('newsForm').classList.toggle('hidden'); }
-    async function publishNews() {
-      const title = document.getElementById('newsTitle').value;
-      const msg = document.getElementById('newsMessage').value;
-      const pri = document.getElementById('newsPriority').value;
-      const resEl = document.getElementById('newsResult');
-      if (!title || !msg) return alert('Title & message required');
-      resEl.style.display = 'block'; resEl.textContent = 'Publishing...';
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/news`, { method:'POST', headers:{'Content-Type':'application/json','X-Admin-Token':adminToken}, body:JSON.stringify({title,message:msg,priority:parseInt(pri)}) });
-        const d = await res.json();
-        resEl.textContent = d.success ? '✅ Published' : '❌ Error';
-        if(d.success){document.getElementById('newsTitle').value='';document.getElementById('newsMessage').value='';}
-      } catch(e){ resEl.textContent=' Network error'; }
-    }
+function loadAnalytics() {
+  document.getElementById('analyticsPanel').classList.remove('hidden');
+  fetch(`${API_BASE}/api/analytics/dashboard`, { headers:{'X-Admin-Token':adminToken} })
+    .then(r=>r.json()).then(d=>{
+      document.getElementById('visitsToday').textContent=d.visits_today||0;
+      document.getElementById('androidRatio').textContent=`${d.android_ratio||0}%`;
+      document.getElementById('apkDownloads').textContent=d.apk_downloads||0;
+      document.getElementById('blockedAttempts').textContent=d.blocked_attempts||0;
+    }).catch(()=>{});
+}
 
-    function toggleVoucherForm() { document.getElementById('voucherForm').classList.toggle('hidden'); }
-    document.getElementById('voucherPlan')?.addEventListener('change', function() {
-      const v = this.value;
-      document.getElementById('txnGroup').classList.toggle('hidden', !(v.startsWith('annual')||v.startsWith('pro')));
-      document.getElementById('payCheckGroup').classList.toggle('hidden', !v.startsWith('annual'));
-      if(!v.startsWith('annual')) document.getElementById('paymentConfirmed').checked = true;
-    });
-    async function generateVoucher() {
-      const phone = document.getElementById('voucherPhone').value.trim();
-      const plan = document.getElementById('voucherPlan').value;
-      const confirmed = document.getElementById('paymentConfirmed')?.checked || true;
-      const txn = document.getElementById('txnId')?.value || '';
-      const resEl = document.getElementById('voucherResult');
-      if(!phone) return alert('Phone required');
-      resEl.style.display='block'; resEl.textContent='Generating...';
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/generate-voucher`, { method:'POST', headers:{'Content-Type':'application/json','X-Admin-Token':adminToken}, body:JSON.stringify({phone_number:phone,plan_id:plan,payment_confirmed:confirmed,txn_id:txn}) });
-        const d = await res.json();
-        resEl.innerHTML = d.success ? `✅ Code: <b>${d.voucher_code}</b><br>TXN: ${txn||'N/A'}<br>Expires: ${new Date(d.expires_at).toLocaleString()}` : `❌ ${d.error}`;
-      } catch(e){ resEl.textContent='❌ Network error'; }
-    }
+async function sendReminders() {
+  if(!confirm('Send renewal SMS to users expiring within 3 days?')) return;
+  try { const res = await fetch(`${API_BASE}/api/admin/send-renewal-reminders`, { method:'POST', headers:{'X-Admin-Token':adminToken} }); alert((await res.json()).message||'Sent'); } catch(e){ alert('Failed'); }
+}
 
-    function loadAnalytics() {
-      document.getElementById('analyticsPanel').classList.remove('hidden');
-      fetch(`${API_BASE}/api/analytics/dashboard`, { headers:{'X-Admin-Token':adminToken} })
-        .then(r=>r.json()).then(d=>{
-          document.getElementById('visitsToday').textContent=d.visits_today||0;
-          document.getElementById('androidRatio').textContent=`${d.android_ratio||0}%`;
-          document.getElementById('apkDownloads').textContent=d.apk_downloads||0;
-          document.getElementById('blockedAttempts').textContent=d.blocked_attempts||0;
-        }).catch(()=>{});
-    }
-
-    async function sendReminders() {
-      if(!confirm('Send renewal SMS to users expiring within 3 days?')) return;
-      try { const res = await fetch(`${API_BASE}/api/admin/send-renewal-reminders`, { method:'POST', headers:{'X-Admin-Token':adminToken} }); alert((await res.json()).message||'Sent'); } catch(e){ alert('Failed'); }
-    }
-
-    if(adminToken) loadDashboard();
-  </script>
+if(adminToken) loadDashboard();
+</script>
 </body>
 </html>
