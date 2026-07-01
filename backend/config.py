@@ -22,3 +22,26 @@ class Config:
     MIKROTIK_PUBLIC_IP=os.environ.get('MIKROTIK_PUBLIC_IP')
     ALLOWED_ORIGINS=[o.strip() for o in os.environ.get('ALLOWED_ORIGINS','').split(',') if o.strip()]
     RATELIMIT_STORAGE_URL=os.environ.get('RATELIMIT_STORAGE_URL','memory://')
+
+
+import socket
+
+DUMMY_PASSWORD = os.environ.get('DUMMY_PASSWORD')  # For test mode fallback
+
+def is_router_online():
+    """Ping MikroTik API port to detect if router is reachable"""
+    if not MIKROTIK_HOST:
+        return False
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(3)  # 3 second timeout
+        result = sock.connect_ex((MIKROTIK_HOST, MIKROTIK_WG_PORT))  # Use your WG port or 8728 for API
+        sock.close()
+        return result == 0
+    except:
+        return False
+
+def is_test_mode():
+    """Auto-detect test vs live mode based on env state"""
+    # Test mode if: no router host OR dummy password exists OR router unreachable
+    return not MIKROTIK_HOST or DUMMY_PASSWORD is not None or not is_router_online()
