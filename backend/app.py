@@ -120,11 +120,20 @@ def create_app():
     def not_found(e):
         return jsonify({'message': 'Not found', 'request_id': getattr(g, 'request_id', None)}), 404
 
-    # Logging Setup
+        # Logging Setup (✅ FIXED: Safe request_id fallback)
     if not os.path.exists('logs'):
         os.mkdir('logs')
     fh = logging.FileHandler('logs/raven.log')
+    # ✅ Use %(request_id)s with fallback via logging filter
     fh.setFormatter(logging.Formatter('%(asctime)s %(levelname)s [%(request_id)s]: %(message)s'))
+    
+    # ✅ Add filter to inject request_id safely
+    class RequestIDFilter(logging.Filter):
+        def filter(self, record):
+            record.request_id = getattr(g, 'request_id', 'N/A')
+            return True
+    fh.addFilter(RequestIDFilter())
+    
     app.logger.addHandler(fh)
     app.logger.setLevel(logging.INFO)
     app.logger.info("Raven NetOps VPN backend initialized")
