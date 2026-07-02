@@ -27,15 +27,24 @@ def create_app():
     migrate.init_app(app, db)
     limiter.init_app(app)
     jwt.init_app(app)
- 
-# ✅ CORS FIX: Explicitly allow origins + methods + headers
-CORS(app, 
-     origins=['https://ravenj-png.github.io', 'https://raven-internet.onrender.com'],
-     supports_credentials=True,
-     allow_headers=['Content-Type', 'Authorization', 'X-Admin-Token', 'X-Idempotency-Key', 'X-Requested-With'],
-     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  # ← Ensure OPTIONS is included
-     expose_headers=['X-Request-ID']
-)         
+    
+    # ✅ CORS FIX — Allow everything for GitHub Pages
+    CORS(app, 
+         origins=['https://ravenj-png.github.io', 'https://raven-internet.onrender.com'],
+         supports_credentials=True,
+         allow_headers=['Content-Type', 'Authorization', 'X-Admin-Token', 'X-Idempotency-Key', 'X-Requested-With'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         expose_headers=['X-Request-ID']
+    )
+
+    # ✅ MANUAL CORS FALLBACK (catches preflight)
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Admin-Token,X-Idempotency-Key')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+        return response
+
     if not app.debug:
         Talisman(app, force_https=True, session_cookie_secure=True, frame_options='DENY')
     
@@ -62,7 +71,7 @@ CORS(app,
     app.register_blueprint(security_bp)
     app.register_blueprint(rune_bp)
     
-    # ✅ REQUEST ID MIDDLEWARE
+    # REQUEST ID MIDDLEWARE
     @app.before_request
     def attach_request_id():
         g.request_id = f"RVNREQ-{datetime.datetime.utcnow().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
@@ -72,7 +81,7 @@ CORS(app,
         response.headers['X-Request-ID'] = getattr(g, 'request_id', 'N/A')
         return response
 
-    # ✅ HEALTH CHECK
+    # HEALTH CHECK
     @app.route('/health')
     def health():
         try:
@@ -96,7 +105,7 @@ CORS(app,
             'version': 'R V1.0.1'
         }), 200 if db_ok else 503
 
-    # ✅ SYSTEM INFO
+    # SYSTEM INFO
     START_TIME = time.time()
     
     @app.route('/api/v1/system/info')
@@ -126,13 +135,12 @@ CORS(app,
     def not_found(e):
         return jsonify({'message': 'Not found', 'request_id': getattr(g, 'request_id', None)}), 404
 
-    # ✅ LOGGING SETUP (FIXED: Safe request_id fallback)
+    # LOGGING SETUP
     if not os.path.exists('logs'):
         os.mkdir('logs')
     fh = logging.FileHandler('logs/raven.log')
     fh.setFormatter(logging.Formatter('%(asctime)s %(levelname)s [%(request_id)s]: %(message)s'))
     
-    # ✅ CRITICAL FIX: Safe filter that never fails
     class RequestIDFilter(logging.Filter):
         def filter(self, record):
             try:
@@ -150,7 +158,6 @@ CORS(app,
 
 app = create_app()
 
-# ✅ DATABASE INITIALIZATION (MOVED INSIDE APP CONTEXT)
 with app.app_context():
     from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog, AuditLog
     try:
