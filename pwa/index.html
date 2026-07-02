@@ -386,7 +386,7 @@ async function initiatePayment() {
   
   try {
     const fp = formatPhoneForPesapal(ph);
-    const res = await fetch(`${API_BASE_URL}/api/v1/plans/purchase`, {
+    const res = await fetch(`${API_BASE_URL}/api/v1/purchase`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Idempotency-Key': idemKey },
       body: JSON.stringify({ phone_number: fp, plan_id: `${selectedDuration}_${selectedPlanType}`, amount: pl.price })
     });
