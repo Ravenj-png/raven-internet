@@ -20,12 +20,14 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+        working-directory: ./apk          # ✅ points to the right folder
 
       - name: Build APK
         run: flutter build apk --release
+        working-directory: ./apk          # ✅ builds inside apk/
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Raven-VPN
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: apk/build/app/outputs/flutter-apk/app-release.apk
