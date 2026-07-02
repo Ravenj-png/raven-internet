@@ -45,6 +45,8 @@
     .plan-details.price{font-size:24px;font-weight:bold;color:var(--primary)}
     .input-group{margin-bottom:16px}
     .input-group label{display:block;margin-bottom:8px;font-size:14px;color:var(--text-muted)}
+    .input-group select{width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:16px;transition:border-color.3s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+    .input-group select:focus{outline:none;border-color:var(--primary)}
     .input-group input{width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:16px;transition:border-color.3s}
     .input-group input:focus{outline:none;border-color:var(--primary)}
     .payment-hint{font-size:13px;color:var(--text-muted);text-align:center;margin-top:8px;min-height:40px}
@@ -81,12 +83,14 @@
     .pro-card h2{color:var(--warning)}
     .annual-card{border:2px solid #8b5cf6}
     .annual-card h2{color:#8b5cf6}
-    @media(max-width:480px){.header h1{font-size:24px}.duration-grid{grid-template-columns:1fr}.voucher-code{font-size:28px;letter-spacing:2px}}
+    #installContainer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:1000;width:90%;max-width:400px}
+    #installBtn{width:100%;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border:none;padding:16px 24px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(59,130,246,0.5);display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px;transition:all.3s}
+    #installBtn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(59,130,246,0.6)}
+    #installBtn.hidden{display:none}
+    @media(max-width:480px){.header h1{font-size:24px}.duration-grid{grid-template-columns:1fr}.voucher-code{font-size:28px;letter-spacing:2px}#installBtn{padding:14px 20px;font-size:14px}}
   </style>
 </head>
 <body>
-  <!-- TEST MODE BANNER REMOVED FOR CLEAN UI -->
-  
   <div class="container">
     <div class="header">
       <h1>🦅 Raven NetOps VPN</h1>
@@ -169,10 +173,23 @@
           <div class="data" id="planData">1 GB Data</div>
           <div class="price" id="planPrice">UGX 950</div>
         </div>
+        
+        <!-- 🌍 COUNTRY DROPDOWN -->
+        <div class="input-group">
+          <label for="countrySelect">🌍 Select Your Country</label>
+          <select id="countrySelect" onchange="updateCountryHint()" style="width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:16px;transition:border-color.3s">
+            <option value="ug">🇺🇬 Uganda (+256)</option>
+            <option value="ke">🇰🇪 Kenya (+254)</option>
+            <option value="tz">🇹🇿 Tanzania (+255)</option>
+            <option value="rw">🇷🇼 Rwanda (+250)</option>
+            <option value="ss">🇸🇸 South Sudan (+211)</option>
+          </select>
+        </div>
+
         <div class="input-group">
           <label for="phoneNumber">📱 Phone Number</label>
-          <input type="tel" id="phoneNumber" placeholder="07XX XXX XXX (UG) | 2547... (KE) | 2557... (TZ)" maxlength="13" oninput="validatePhone()">
-          <p id="paymentHint" class="payment-hint">🔒 Pesapal auto-detects MTN, Airtel, or M-Pesa</p>
+          <input type="tel" id="phoneNumber" placeholder="07XX XXX XXX" maxlength="15" oninput="validatePhone()">
+          <p id="paymentHint" class="payment-hint">🔒 Enter your phone number</p>
         </div>
         <button id="payButton" class="btn btn-primary" onclick="initiatePayment()" disabled>Pay with Pesapal</button>
       </div>
@@ -300,8 +317,8 @@
   </div>
 
 <!-- PWA Install Button -->
-<div id="installContainer" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1000;">
-  <button id="installBtn" onclick="installPWA()" style="background:#3b82f6;color:white;border:none;padding:12px 24px;border-radius:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,0.4);display:flex;align-items:center;gap:8px;">
+<div id="installContainer">
+  <button id="installBtn" onclick="installPWA()">
     <span>📥</span>
     <span>Install Raven VPN</span>
   </button>
@@ -335,20 +352,39 @@ window.addEventListener('appinstalled', () => {
   
 //  CONFIG & STATE
 let currentMode = 'test';
+let selectedCountry = 'ug';
 const API_BASE_URL = 'https://raven-internet.onrender.com';
 const PLANS = {
   basic: { daily: { speed: '1 Mbps', data: '1 GB', price: 950, duration: '24 hours' }, weekly: { speed: '1.5 Mbps', data: '7 GB', price: 6500, duration: '7 days' }, monthly: { speed: '1.5 Mbps', data: '20 GB', price: 15000, duration: '30 days' } },
   premium: { daily: { speed: '2 Mbps', data: '1 GB', price: 1200, duration: '24 hours' }, weekly: { speed: '2.5 Mbps', data: '7 GB', price: 8000, duration: '7 days' }, monthly: { speed: '3 Mbps', data: '30 GB', price: 25000, duration: '30 days' } }
 };
-const PHONE_CONFIG = { uganda: { code: '+256', networks: 'MTN or Airtel' }, kenya: { code: '+254', networks: 'M-Pesa or Airtel' }, tanzania: { code: '+255', networks: 'M-Pesa or Airtel' } };
+const COUNTRY_CONFIG = { 
+  ug: { code: '256', prefix: '07', name: 'Uganda', networks: 'MTN or Airtel' },
+  ke: { code: '254', prefix: '07', name: 'Kenya', networks: 'Safaricom or Airtel' },
+  tz: { code: '255', prefix: '07', name: 'Tanzania', networks: 'Vodacom or Airtel' },
+  rw: { code: '250', prefix: '07', name: 'Rwanda', networks: 'MTN or Airtel' },
+  ss: { code: '211', prefix: '09', name: 'South Sudan', networks: 'MTN or Zain' }
+};
 let selectedPlanType = 'basic', selectedDuration = 'daily', voucherCode = null;
 let currentSection = 'home';
+
+// 🌍 COUNTRY SELECTION
+function updateCountryHint() {
+  const select = document.getElementById('countrySelect');
+  selectedCountry = select.value;
+  const c = COUNTRY_CONFIG[selectedCountry];
+  const hint = document.getElementById('paymentHint');
+  const ph = document.getElementById('phoneNumber');
+  ph.placeholder = `${c.prefix}XX XXX XXX (${c.name})`;
+  hint.innerHTML = `✅ ${c.name} • ${c.networks} supported<br><small>Pesapal will auto-detect</small>`;
+  hint.className = 'payment-hint valid';
+  validatePhone();
+}
 
 //  NAVIGATION
 function toggleNav() { 
   document.querySelector('.nav-overlay').classList.toggle('open'); 
   document.querySelector('.nav-drawer').classList.toggle('open'); 
-  // Fix scroll loop
   document.body.style.overflow = document.querySelector('.nav-drawer').classList.contains('open') ? 'hidden' : 'auto';
 }
 function navigate(section) { 
@@ -369,19 +405,64 @@ function selectPlanType(type) { selectedPlanType = type; document.querySelectorA
 function selectDuration(duration) { selectedDuration = duration; document.querySelectorAll('.duration-btn').forEach((el, idx) => { el.classList.remove('active'); if ((duration === 'daily' && idx === 0) || (duration === 'weekly' && idx === 1) || (duration === 'monthly' && idx === 2)) el.classList.add('active'); }); updatePlanDisplay(); }
 function updatePlanDisplay() { const p = PLANS[selectedPlanType][selectedDuration]; document.getElementById('planSpeed').textContent = p.speed; document.getElementById('planData').textContent = p.data; document.getElementById('planPrice').textContent = `UGX ${p.price.toLocaleString()}`; }
 
-//  PHONE VALIDATION
-function detectCountry(phone) { const c = phone.replace(/[\s\-]/g, ''); if (/^07[0-9]{8}$/.test(c) || /^2567[0-9]{9}$/.test(c)) return 'uganda'; if (/^2547[0-9]{9}$/.test(c)) return 'kenya'; if (/^2557[0-9]{9}$/.test(c)) return 'tanzania'; return null; }
-function formatPhoneForPesapal(p) { p = p.replace(/[\s\-]/g, ''); if (p.startsWith('+')) p = p.substring(1); if (p.startsWith('00')) p = p.substring(2); if (p.startsWith('07') && p.length === 10) p = '256' + p.substring(1); return p; }
-function validatePhone() { const ph = document.getElementById('phoneNumber').value.trim(); const h = document.getElementById('paymentHint'); const b = document.getElementById('payButton'); if (!ph) { b.disabled = true; h.textContent = '🔒 Pesapal auto-detects MTN, Airtel, or M-Pesa'; h.className = 'payment-hint'; return; } const c = detectCountry(ph); if (!c) { b.disabled = true; h.textContent = '❌ Invalid. Use: 07XX... (UG) | 2547... (KE) | 2557... (TZ)'; h.className = 'payment-hint invalid'; return; } b.disabled = false; h.innerHTML = `✅ ${c.toUpperCase()} • ${PHONE_CONFIG[c].networks} supported<br><small>Pesapal will auto-detect</small>`; h.className = 'payment-hint valid'; }
+// 📱 PHONE VALIDATION WITH COUNTRY DROPDOWN
+function detectCountry(phone) { 
+  // Just use selected country
+  return selectedCountry;
+}
+function formatPhoneForPesapal(p) { 
+  p = p.replace(/[\s\-\(\)]/g, ''); 
+  if (p.startsWith('+')) p = p.substring(1); 
+  if (p.startsWith('00')) p = p.substring(2); 
+  const c = COUNTRY_CONFIG[selectedCountry];
+  // If starts with country code prefix (e.g., 256...) remove it
+  if (p.startsWith(c.code) && p.length > c.code.length) {
+    return p; // already has country code
+  }
+  // If starts with local prefix (e.g., 07...) convert to E.164
+  if (p.startsWith('0') && p.length >= 9) {
+    p = p.substring(1); // remove leading 0
+  }
+  return c.code + p;
+}
+function validatePhone() { 
+  const ph = document.getElementById('phoneNumber').value.trim(); 
+  const h = document.getElementById('paymentHint'); 
+  const b = document.getElementById('payButton'); 
+  if (!ph) { 
+    b.disabled = true; 
+    h.textContent = '🔒 Enter your phone number'; 
+    h.className = 'payment-hint'; 
+    return; 
+  } 
+  const c = COUNTRY_CONFIG[selectedCountry];
+  // Check if number matches expected format
+  const cleaned = ph.replace(/[\s\-\(\)]/g, '');
+  const hasCountryCode = cleaned.startsWith(c.code);
+  const hasLocalPrefix = cleaned.startsWith('0');
+  const minLength = c.code.length + 7; // at least 7 digits after country code
+  const maxLength = c.code.length + 12;
+  
+  if ((hasCountryCode && cleaned.length >= minLength && cleaned.length <= maxLength) ||
+      (hasLocalPrefix && cleaned.length >= 8 && cleaned.length <= 12) ||
+      (!hasCountryCode && !hasLocalPrefix && cleaned.length >= 7 && cleaned.length <= 12)) {
+    b.disabled = false; 
+    h.innerHTML = `✅ ${c.name} • ${c.networks} supported<br><small>Pesapal will auto-detect</small>`; 
+    h.className = 'payment-hint valid'; 
+  } else { 
+    b.disabled = true; 
+    h.textContent = `❌ Invalid ${c.name} number. Use ${c.prefix}XX... or +${c.code}...`; 
+    h.className = 'payment-hint invalid'; 
+  } 
+}
 
-// 💸 HARDENED PAYMENT FLOW (CONNECTS TO BACKEND)
+// 💸 PAYMENT FLOW
 async function initiatePayment() {
   const ph = document.getElementById('phoneNumber').value;
   const pl = PLANS[selectedPlanType][selectedDuration];
   const btn = document.getElementById('payButton');
   btn.disabled = true; btn.innerHTML = '<span class="loading"></span> Processing...';
   
-  // ✅ Idempotency key prevents double charges
   const idemKey = 'RVN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
   
   try {
@@ -394,7 +475,7 @@ async function initiatePayment() {
     
     if (d.status === 'SUCCESS') { onPaymentSuccess(d.voucher_code, pl.duration, pl.data); } 
     else if (d.status === 'PENDING_REVIEW') { showToast(' Payment processing. Check back shortly.', 'warning'); btn.disabled = false; btn.textContent = '💳 Pay with Pesapal'; } 
-    else { showToast(' ' + (d.message || 'Payment failed'), 'error'); btn.disabled = false; btn.textContent = ' Pay with Pesapal'; }
+    else { showToast(' ' + (d.message || 'Payment failed'), 'error'); btn.disabled = false; btn.textContent = '💳 Pay with Pesapal'; }
   } catch (e) { showToast('❌ Network error. Check connection.', 'error'); btn.disabled = false; btn.textContent = '💳 Pay with Pesapal'; }
 }
 
@@ -413,7 +494,6 @@ function onPaymentSuccess(c, d, dl) {
   document.getElementById('smsPhone').textContent = document.getElementById('phoneNumber').value; 
   if (currentMode === 'prod') document.getElementById('postPaymentApk').classList.remove('hidden'); 
   
-  // ✅ Save locally for "My Vouchers"
   const vouchers = JSON.parse(localStorage.getItem('raven_vouchers') || '[]');
   vouchers.unshift({ code: c, duration: d, data: dl, expires: new Date(Date.now() + 24*60*60*1000).toISOString() });
   localStorage.setItem('raven_vouchers', JSON.stringify(vouchers.slice(0, 5)));
@@ -438,7 +518,7 @@ function toggleTheme(){const t=document.documentElement.getAttribute('data-theme
 function showAbout(){alert('Raven NetOps VPN v1.0.1\n\nBuilt for East Africa.\nAuto-Switch Architecture Active.\n\n🦅 Secure • Fast • No Logs');}
 function showWhatsNew(){alert('🆕 What\'s New in v1.0.1:\n\n✅ Auto-Switch Test/Live Mode\n✅ Idempotent Payments (no double charges)\n✅ E.164 Phone Support (UG, KE, TZ, RW, SS)\n✅ Rune Language Preview\n✅ Faster PWA + APK\n\nComing Soon: Loyalty Program, Referrals');}
 
-window.addEventListener('load', () => { updatePlanDisplay(); checkAPK(); trackVisit(); const t=localStorage.getItem('raven_theme'); if(t) document.documentElement.setAttribute('data-theme',t); const u = new URLSearchParams(window.location.search).get('voucher'); if (u) onPaymentSuccess(u, '24h', '1GB') });
+window.addEventListener('load', () => { updatePlanDisplay(); checkAPK(); trackVisit(); const t=localStorage.getItem('raven_theme'); if(t) document.documentElement.setAttribute('data-theme',t); const u = new URLSearchParams(window.location.search).get('voucher'); if (u) onPaymentSuccess(u, '24h', '1GB'); updateCountryHint(); });
 </script>
 </body>
 </html>
