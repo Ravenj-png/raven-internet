@@ -18,6 +18,7 @@ import os
 import time
 import uuid
 import datetime
+from sqlalchemy import text, inspect
 
 def create_app():
     app = Flask(__name__)
@@ -80,7 +81,7 @@ def create_app():
     @app.route('/health')
     def health():
         try:
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1'))
             db_ok = True
         except:
             db_ok = False
@@ -109,7 +110,7 @@ def create_app():
         
         db_ok = False
         try:
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1'))
             db_ok = True
         except:
             pass
@@ -155,18 +156,22 @@ app = create_app()
 with app.app_context():
     from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog, AuditLog
     try:
-        from sqlalchemy import inspect
-        
-        # Check if phone_number exists in transactions
         inspector = inspect(db.engine)
-        columns = [col['name'] for col in inspector.get_columns('transactions')]
         
-        if 'phone_number' not in columns:
-            app.logger.info("⚠️ Missing phone_number column — adding it...")
-            db.session.execute('ALTER TABLE transactions ADD COLUMN phone_number VARCHAR(20) NOT NULL DEFAULT ""')
-            db.session.commit()
-            app.logger.info("✅ phone_number column added")
+        # Check if the transactions table exists
+        if inspector.has_table('transactions'):
+            columns = [col['name'] for col in inspector.get_columns('transactions')]
+            if 'phone_number' not in columns:
+                app.logger.info("⚠️ Missing phone_number column — adding it...")
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN phone_number VARCHAR(20) NOT NULL DEFAULT \'\''))
+                db.session.commit()
+                app.logger.info("✅ phone_number column added")
+            else:
+                app.logger.info("✅ phone_number column already exists")
+        else:
+            app.logger.info("⚠️ transactions table does not exist — will create all tables")
         
+        # Create any missing tables
         db.create_all()
         app.logger.info("✅ Database tables created/verified")
     except Exception as e:
