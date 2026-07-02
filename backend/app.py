@@ -161,6 +161,8 @@ with app.app_context():
         # Check if the transactions table exists
         if inspector.has_table('transactions'):
             columns = [col['name'] for col in inspector.get_columns('transactions')]
+            
+            # ✅ Add phone_number if missing
             if 'phone_number' not in columns:
                 app.logger.info("⚠️ Missing phone_number column — adding it...")
                 db.session.execute(text('ALTER TABLE transactions ADD COLUMN phone_number VARCHAR(20) NOT NULL DEFAULT \'\''))
@@ -168,6 +170,42 @@ with app.app_context():
                 app.logger.info("✅ phone_number column added")
             else:
                 app.logger.info("✅ phone_number column already exists")
+            
+            # ✅ Add voucher_code if missing
+            if 'voucher_code' not in columns:
+                app.logger.info("⚠️ Missing voucher_code column — adding it...")
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN voucher_code VARCHAR(20) DEFAULT NULL'))
+                db.session.commit()
+                app.logger.info("✅ voucher_code column added")
+            else:
+                app.logger.info("✅ voucher_code column already exists")
+            
+            # ✅ Add merchant_reference if missing
+            if 'merchant_reference' not in columns:
+                app.logger.info("⚠️ Missing merchant_reference column — adding it...")
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN merchant_reference VARCHAR(100) DEFAULT NULL'))
+                db.session.commit()
+                app.logger.info("✅ merchant_reference column added")
+            else:
+                app.logger.info("✅ merchant_reference column already exists")
+                
+            # ✅ Add idempotency_key if missing
+            if 'idempotency_key' not in columns:
+                app.logger.info("⚠️ Missing idempotency_key column — adding it...")
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN idempotency_key VARCHAR(100) DEFAULT NULL'))
+                db.session.commit()
+                app.logger.info("✅ idempotency_key column added")
+            else:
+                app.logger.info("✅ idempotency_key column already exists")
+                
+            # ✅ Add is_test if missing
+            if 'is_test' not in columns:
+                app.logger.info("⚠️ Missing is_test column — adding it...")
+                db.session.execute(text('ALTER TABLE transactions ADD COLUMN is_test BOOLEAN DEFAULT FALSE'))
+                db.session.commit()
+                app.logger.info("✅ is_test column added")
+            else:
+                app.logger.info("✅ is_test column already exists")
         else:
             app.logger.info("⚠️ transactions table does not exist — will create all tables")
         
