@@ -424,3 +424,429 @@ window.addEventListener('load', () => { updatePlanDisplay(); checkMode(); checkA
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b1120">
+  <title>Raven NetOps VPN - Fast Internet Anywhere</title>
+  <link rel="manifest" href="./manifest.json">
+  <style>
+    :root{--bg:#0b1120;--card:#1e293b;--primary:#3b82f6;--success:#10b981;--text:#f8fafc;--text-muted:#94a3b8;--border:#334155;--warning:#f59e0b;--danger:#ef4444}
+    :root[data-theme='light']{--bg:#f8fafc;--card:#fff;--primary:#2563eb;--success:#059669;--text:#0f172a;--text-muted:#64748b;--border:#cbd5e1;--warning:#d97706;--danger:#dc2626}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+    body{background:var(--bg);color:var(--text);min-height:100vh;padding:20px;line-height:1.6;overflow-x:hidden;transition:background.3s,color.3s}
+    .container{max-width:480px;margin:0 auto}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-top:10px}
+    .header h1{font-size:28px;background:linear-gradient(135deg,var(--primary),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .hamburger{background:none;border:none;color:var(--text);font-size:24px;cursor:pointer;padding:8px}
+    .nav-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:99;opacity:0;pointer-events:none;transition:opacity.3s}
+    .nav-overlay.open{opacity:1;pointer-events:auto}
+    .nav-drawer{position:fixed;top:0;left:-280px;width:260px;height:100%;background:var(--card);z-index:100;transition:left.3s;padding:20px;border-right:1px solid var(--border);overflow-y:auto}
+    .nav-drawer.open{left:0}
+    .nav-item{display:block;padding:12px 14px;margin-bottom:4px;border-radius:8px;color:var(--text);text-decoration:none;transition:background.2s;font-size:14px}
+    .nav-item:hover,.nav-item.active{background:var(--bg)}
+    .nav-close{position:absolute;top:15px;right:15px;background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer}
+    .nav-divider{height:1px;background:var(--border);margin:12px 0}
+    .nav-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 14px 6px;margin-top:8px}
+    .page-section{display:none;animation:fadeIn.3s}
+    .page-section.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,0.3)}
+    .card h2{font-size:20px;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .plan-toggle{display:flex;gap:12px;margin-bottom:24px}
+    .plan-option{flex:1;padding:16px;border:2px solid var(--border);border-radius:12px;text-align:center;cursor:pointer;transition:all.3s}
+    .plan-option:hover{border-color:var(--primary)}
+    .plan-option.active{border-color:var(--success);background:rgba(16,185,129,0.1)}
+    .plan-option h3{font-size:16px;margin-bottom:4px}
+    .plan-option p{font-size:12px;color:var(--text-muted)}
+    .duration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    .duration-btn{padding:12px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);cursor:pointer;transition:all.3s;font-size:14px}
+    .duration-btn:hover{border-color:var(--primary)}
+    .duration-btn.active{border-color:var(--primary);background:var(--primary);font-weight:600}
+    .plan-details{background:var(--bg);padding:16px;border-radius:10px;margin-bottom:20px;text-align:center}
+    .plan-details .speed{font-size:28px;font-weight:bold;color:var(--success);margin-bottom:4px}
+    .plan-details.data{font-size:14px;color:var(--text-muted);margin-bottom:8px}
+    .plan-details.price{font-size:24px;font-weight:bold;color:var(--primary)}
+    .input-group{margin-bottom:16px}
+    .input-group label{display:block;margin-bottom:8px;font-size:14px;color:var(--text-muted)}
+    .input-group input{width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:16px;transition:border-color.3s}
+    .input-group input:focus{outline:none;border-color:var(--primary)}
+    .payment-hint{font-size:13px;color:var(--text-muted);text-align:center;margin-top:8px;min-height:40px}
+    .payment-hint.valid{color:var(--success)}
+    .payment-hint.invalid{color:var(--danger)}
+    .btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all.3s;text-transform:uppercase;letter-spacing:.5px;text-decoration:none;display:inline-block;text-align:center}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),#2563eb);color:white}
+    .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 12px rgba(59,130,246,0.4)}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+    .btn-success{background:linear-gradient(135deg,var(--success),#059669);color:white}
+    .voucher-box{background:linear-gradient(135deg,#064e3b,#065f46);padding:24px;border-radius:12px;text-align:center;margin-bottom:20px;border:2px solid var(--success)}
+    .voucher-code{font-size:36px;font-weight:bold;letter-spacing:4px;font-family:'Courier New',monospace;margin:16px 0;word-break:break-all;cursor:pointer}
+    .voucher-code:hover{transform:scale(1.02);transition:transform.2s}
+    .voucher-info{font-size:14px;color:var(--text-muted);margin-top:8px}
+    .apk-section{text-align:center;padding:20px;background:var(--bg);border-radius:10px;margin-top:16px}
+    .apk-section h3{margin-bottom:12px}
+    .apk-section p{font-size:14px;color:var(--text-muted);margin-bottom:16px}
+    .steps{list-style:none;margin-top:16px}
+    .steps li{padding:12px;margin-bottom:8px;background:var(--bg);border-radius:8px;font-size:14px;display:flex;align-items:center;gap:12px}
+    .steps li.step-num{width:28px;height:28px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0}
+    .hidden{display:none!important}
+    .loading{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:white;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .footer{text-align:center;color:var(--text-muted);margin-top:24px;font-size:12px}
+    .footer a{color:var(--text-muted);text-decoration:none;margin:0 8px}
+    .footer a:hover{color:var(--primary)}
+    .news-card{background:var(--bg);padding:16px;border-radius:10px;margin-bottom:12px;border-left:4px solid var(--primary)}
+    .news-card h3{font-size:16px;margin-bottom:6px}
+    .news-card p{font-size:14px;color:var(--text-muted)}
+    .news-card.date{font-size:12px;color:var(--text-muted);margin-top:8px}
+    .alert-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);padding:12px 20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;gap:10px;animation:slideUp .3s}
+    @keyframes slideUp{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+    .pro-card{border:2px solid var(--warning)}
+    .pro-card h2{color:var(--warning)}
+    .annual-card{border:2px solid #8b5cf6}
+    .annual-card h2{color:#8b5cf6}
+    @media(max-width:480px){.header h1{font-size:24px}.duration-grid{grid-template-columns:1fr}.voucher-code{font-size:28px;letter-spacing:2px}}
+  </style>
+</head>
+<body>
+  <div id="testModeBanner" class="hidden" style="background:var(--warning);color:#0b1120;padding:12px;text-align:center;font-weight:bold;position:sticky;top:0;z-index:100;border-radius:0 0 12px 12px">⚠️ TEST MODE - No real charges. Demo only.</div>
+  
+  <div class="container">
+    <div class="header">
+      <h1>🦅 Raven NetOps VPN</h1>
+      <button class="hamburger" onclick="toggleNav()">☰</button>
+    </div>
+
+    <div class="nav-overlay" onclick="toggleNav()"></div>
+    <div class="nav-drawer">
+      <button class="nav-close" onclick="toggleNav()">✕</button>
+      <div style="padding:12px 0 20px;border-bottom:1px solid var(--border);margin-bottom:16px">
+        <h2 style="font-size:18px;color:var(--primary);margin:0">🦅 Raven NetOps VPN</h2>
+        <p style="font-size:12px;color:var(--text-muted);margin:4px 0 0">East Africa's Student Internet</p>
+        <span style="display:inline-block;background:var(--bg);color:var(--text-muted);padding:2px 8px;border-radius:12px;font-size:10px;margin-top:8px">v1.0.1 • Stable</span>
+      </div>
+      
+      <a href="#home" class="nav-item active" onclick="navigate('home')">📊 My Dashboard</a>
+      <a href="#connection" class="nav-item" onclick="navigate('connection')">🔗 My Connection</a>
+      <a href="#news" class="nav-item" onclick="navigate('news')">📢 Updates & Tips</a>
+      <a href="#membership" class="nav-item" onclick="navigate('membership')">🏆 Rewards</a>
+      
+      <div class="nav-divider"></div>
+      <div class="nav-label">Need Help?</div>
+      <a href="#support" class="nav-item" onclick="navigate('support')">🆘 Get Help</a>
+      <a href="./howto.html" class="nav-item" target="_blank">📖 Quick Guide</a>
+      <a href="./developers.html" class="nav-item" target="_blank">💻 Developers</a>
+      <a href="https://wa.me/256741227707?text=Bug%20Report%3A%20" class="nav-item" target="_blank">🐞 Report a Bug</a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-label">⚙️ Settings</div>
+      <a href="#" class="nav-item" onclick="toggleTheme()">🌙 Appearance</a>
+      <a href="#my-vouchers" class="nav-item" onclick="navigate('my-vouchers')">🎫 My Vouchers</a>
+      <a href="#payment-history" class="nav-item" onclick="navigate('payment-history')">💳 Payment History</a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-label">ℹ️ About</div>
+      <a href="#" class="nav-item" onclick="showAbout()">ℹ️ About Raven</a>
+      <a href="#" class="nav-item" onclick="showWhatsNew()">🆕 What's New</a>
+      <a href="https://github.com/Ravenj-png/raven-internet" class="nav-item" target="_blank">⭐ Rate on GitHub</a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-label">Your Rights</div>
+      <a href="./privacy.html" class="nav-item" target="_blank">🔒 Your Privacy</a>
+      <a href="./terms.html" class="nav-item" target="_blank">📜 Fair Use Policy</a>
+      <a href="./rules.html" class="nav-item" target="_blank">📋 Community Rules</a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-label">Legal</div>
+      <a href="https://github.com/Ravenj-png/raven-internet/blob/main/LICENSE" class="nav-item" target="_blank">📄 Licenses</a>
+      <a href="#" class="nav-item" onclick="alert('© 2026 Raven NetOps VPN. Built for East Africa.')">© Copyright</a>
+      
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);text-align:center">
+        <p style="font-size:11px;color:var(--text-muted);margin:0">🦅 Built for East Africa • Secure • No Logs</p>
+      </div>
+    </div>
+
+    <div id="home" class="page-section active">
+      <div id="apkSection" class="card hidden">
+        <h2>📲 Install Raven NetOps VPN App</h2>
+        <div class="apk-section"><p>Download and install the Raven NetOps VPN app to get started</p>
+        <a href="https://your-server.com/raven-vpn.apk" class="btn btn-primary">📥 Download APK (18 MB)</a>
+        <p style="margin-top:12px;font-size:12px">Android 8.0+ required</p></div>
+      </div>
+
+      <div id="paymentSection" class="card">
+        <h2>💳 Choose Your Plan</h2>
+        <div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)">
+          <span>🔒 Secure Pesapal</span><span>⚡ Instant Activation</span><span>💬 WhatsApp Support</span><span>🛡️ No Logs</span>
+        </div>
+        <div class="plan-toggle">
+          <div class="plan-option active" onclick="selectPlanType('basic')"><h3>🟦 Basic</h3><p>1 Mbps Speed</p></div>
+          <div class="plan-option" onclick="selectPlanType('premium')"><h3>🟪 Premium</h3><p>2 Mbps Speed</p></div>
+        </div>
+        <div class="duration-grid">
+          <button class="duration-btn active" onclick="selectDuration('daily')">Daily</button>
+          <button class="duration-btn" onclick="selectDuration('weekly')">Weekly</button>
+          <button class="duration-btn" onclick="selectDuration('monthly')">Monthly</button>
+        </div>
+        <div class="plan-details">
+          <div class="speed" id="planSpeed">1 Mbps</div>
+          <div class="data" id="planData">1 GB Data</div>
+          <div class="price" id="planPrice">UGX 950</div>
+        </div>
+        <div class="input-group">
+          <label for="phoneNumber">📱 Phone Number</label>
+          <input type="tel" id="phoneNumber" placeholder="07XX XXX XXX (UG) | 2547... (KE) | 2557... (TZ)" maxlength="13" oninput="validatePhone()">
+          <p id="paymentHint" class="payment-hint">🔒 Pesapal auto-detects MTN, Airtel, or M-Pesa</p>
+        </div>
+        <button id="payButton" class="btn btn-primary" onclick="initiatePayment()" disabled>Pay with Pesapal</button>
+      </div>
+
+      <div id="voucherSection" class="card hidden">
+        <h2>✅ Payment Successful!</h2>
+        <div class="voucher-box">
+          <div style="font-size:14px;color:var(--text-muted)">Your Access Code</div>
+          <div class="voucher-code" id="voucherCode" onclick="copyCode()" title="Tap to copy">RVN-ABC1234</div>
+          <div id="copyFeedback" style="font-size:13px;color:var(--success);margin-top:8px;min-height:20px"></div>
+          <div class="voucher-info">Valid for <span id="voucherDuration">24 hours</span> • <span id="voucherData">1 GB</span></div>
+        </div>
+        <button class="btn btn-success" onclick="copyCode()" style="margin-bottom:20px">📋 Copy Code to Clipboard</button>
+        <div id="postPaymentApk" class="apk-section hidden">
+          <h3>📥 Download Raven NetOps VPN App</h3>
+          <p>You need the app to use this voucher code</p>
+          <a href="https://your-server.com/raven-vpn.apk" class="btn btn-primary">📥 Download APK</a>
+          <ul class="steps">
+            <li><span class="step-num">1</span><span>Download & install</span></li>
+            <li><span class="step-num">2</span><span>Open app & paste code</span></li>
+            <li><span class="step-num">3</span><span>Tap Connect</span></li>
+          </ul>
+        </div>
+        <div class="apk-section" style="background:var(--card);margin-top:16px">
+          <h3>📱 Already Have the App?</h3>
+          <p>Open Raven NetOps VPN and paste your code</p>
+          <button class="btn btn-primary" onclick="openApp()">🚀 Open Raven NetOps VPN</button>
+        </div>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">📲 Code also sent to <strong id="smsPhone">your phone</strong> via SMS</p>
+      </div>
+
+      <div id="proSection" class="card pro-card" style="margin-top:24px">
+        <h2>🔥 Raven PRO & Annual Plans</h2>
+        <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px">Manual approval required. Perfect for heavy users & long-term savings.</p>
+        <h3 style="margin:20px 0 12px;color:var(--text)">🚀 PRO Bundles (2 Months)</h3>
+        <div class="duration-grid">
+          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_30gb')"><h3>🟨 PRO 30</h3><p>30 GB • 4 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 30,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
+          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_50gb')"><h3>🟨 PRO 50</h3><p>50 GB • 6 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 70,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
+          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_60gb')"><h3>🟨 PRO 60</h3><p>60 GB • 10 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 95,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
+        </div>
+        <h3 style="margin:24px 0 12px;color:var(--text)">📅 Annual & Special (1 Year)</h3>
+        <div class="duration-grid">
+          <div class="plan-option annual-card" onclick="requestPRO('annual_250gb')"><h3>🟧 Annual 250</h3><p>250 GB • 1 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 300,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
+          <div class="plan-option annual-card" onclick="requestPRO('annual_450gb')"><h3>🟧 Annual 450</h3><p>450 GB • 2 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 400,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
+          <div class="plan-option annual-card" onclick="requestPRO('annual_unlimited')"><h3>🟣 Annual Unlimited</h3><p>Unlimited Data • 3 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 600,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;text-align:center">
+        <h3>🆘 Need Help?</h3>
+        <p style="color:var(--text-muted);margin-bottom:16px">We're here for you. Reach out anytime:</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="https://wa.me/256741227707" class="btn" style="background:#25D366;max-width:200px">💬 WhatsApp</a>
+          <a href="mailto:jovanraven9@gmail.com" class="btn" style="background:#3b82f6;max-width:200px">📧 Email</a>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px">Response time: < 2 hours (business days)</p>
+      </div>
+    </div>
+
+    <div id="connection" class="page-section">
+      <div class="card">
+        <h2 style="margin-bottom:20px;">🔗 My Connection Status</h2>
+        <div id="connectionStatus" style="display:none; background: var(--bg); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color: var(--text-muted);">Data Used</span><span id="connUsed">—</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color: var(--text-muted);">Data Left</span><span id="connLeft">—</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="color: var(--text-muted);">Speed</span><span id="connSpeed">—</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color: var(--text-muted);">Expires</span><span id="connExpiry">—</span></div>
+          <button onclick="refreshConnection()" style="margin-top:16px; width:100%; padding:10px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">🔄 Refresh Status</button>
+        </div>
+        <div id="connectionNotActive" style="text-align:center; padding:24px 16px; color:var(--text-muted);">
+          <p style="margin-bottom:16px;">Connect via the Raven NetOps VPN app to see your status here.</p>
+          <a href="https://your-server.com/raven-vpn.apk" class="btn btn-primary" style="max-width:200px;">📥 Download App</a>
+        </div>
+        <div style="margin-top:24px; padding:12px; background:rgba(16,185,129,0.1); border-radius:8px; border-left:3px solid var(--success);">
+          <p style="font-size:13px; color:var(--text-muted); margin:0;">🔒 Your connection data is encrypted and never logged.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="my-vouchers" class="page-section">
+      <div class="card">
+        <h2>🎫 My Vouchers</h2>
+        <div id="vouchersList"><p style="color:var(--text-muted);text-align:center">No active vouchers. Buy a plan to get started.</p></div>
+        <button onclick="loadVouchers()" style="margin-top:16px;width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer">↻ Refresh</button>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;text-align:center">Vouchers are stored locally. Clearing browser data will remove them.</p>
+      </div>
+    </div>
+
+    <div id="payment-history" class="page-section">
+      <div class="card">
+        <h2>💳 Payment History</h2>
+        <p style="color:var(--text-muted);text-align:center;margin-bottom:16px">For privacy, Raven doesn't store payment history on our servers.</p>
+        <div style="background:var(--bg);padding:16px;border-radius:10px;margin-bottom:12px">
+          <strong>How to track payments:</strong>
+          <ul style="margin-top:8px;padding-left:20px;color:var(--text-muted);font-size:14px">
+            <li>Check your mobile money SMS confirmations</li>
+            <li>Save voucher codes after purchase</li>
+            <li>Contact support with transaction reference for help</li>
+          </ul>
+        </div>
+        <a href="https://wa.me/256741227707?text=Payment%20Help%3A%20" class="btn" style="background:#25D366;color:white;border:none">💬 WhatsApp Support</a>
+      </div>
+    </div>
+
+    <div id="news" class="page-section"><div class="card"><h2>📢 Latest News & Updates</h2><div id="newsContainer"><p style="color:var(--text-muted);text-align:center">Loading news...</p></div></div></div>
+    <div id="membership" class="page-section"><div class="card" style="margin-top:0; border: 1px solid var(--primary);"><h2 style="color:var(--primary); margin-bottom:20px; text-align:center;">🏆 Raven Loyalty Program</h2>
+      <div style="background: linear-gradient(145deg,#1e293b,#0f172a); padding: 24px 16px; border-radius: 12px; border: 1px solid rgba(59,130,246,0.2); position: relative; overflow: hidden;">
+        <div style="position: absolute; top:-40%; right:-20%; width: 120px; height: 120px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
+        <h3 style="color:#f8fafc; margin: 0 0 12px; font-size: 20px; text-align:center;">Your Loyalty Deserves More</h3>
+        <p style="color: var(--text-muted); font-size: 15px; line-height: 1.6; margin: 0 0 20px; text-align:center;">Stay connected, invite friends, and climb the ranks to unlock bonus data, priority support, and exclusive network perks.</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; text-align: left;">
+          <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);"><div style="font-size: 16px; margin-bottom:4px;">🥉 Bronze</div><div style="font-size: 12px; color: var(--text-muted);">5 Referrals</div></div>
+          <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);"><div style="font-size: 16px; margin-bottom:4px;">🥈 Silver</div><div style="font-size: 12px; color: var(--text-muted);">20 Referrals</div></div>
+          <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);"><div style="font-size: 16px; margin-bottom:4px;">🥇 Gold</div><div style="font-size: 12px; color: var(--text-muted);">50 Referrals</div></div>
+          <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);"><div style="font-size: 16px; margin-bottom:4px;">💎 Diamond</div><div style="font-size: 12px; color: var(--text-muted);">200 Referrals</div></div>
+        </div>
+        <div style="text-align:center;"><span style="display: inline-block; background: linear-gradient(90deg, var(--warning),#fbbf24); color:#0b1120; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);">🚀 COMING IN THE NEXT UPDATE</span></div>
+      </div></div></div>
+    <div id="support" class="page-section"><div class="card"><h2>🆘 Support & FAQ</h2>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px"><a href="https://wa.me/256741227707" class="btn" style="background:#25D366;max-width:200px">💬 WhatsApp</a><a href="mailto:jovanraven9@gmail.com" class="btn" style="background:#3b82f6;max-width:200px">📧 Email</a></div>
+      <div style="background:var(--bg);padding:16px;border-radius:10px;margin-bottom:12px"><strong>How do I connect?</strong><p style="color:var(--text-muted);margin-top:6px">Pay via PWA → Copy code → Open APK → Paste → Connect</p></div>
+      <div style="background:var(--bg);padding:16px;border-radius:10px"><strong>Does data pause when disconnected?</strong><p style="color:var(--text-muted);margin-top:6px">Yes! Data pauses when you disconnect, but time keeps running.</p></div></div></div>
+      
+    <div class="footer">© 2026 Raven NetOps VPN • <a href="./howto.html" target="_blank">How to Use</a> • <a href="./privacy.html" target="_blank">Privacy</a> • <a href="./terms.html" target="_blank">Terms</a> • <a href="./rules.html" target="_blank">Rules</a></div>
+  </div>
+
+<script>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ Service Worker registered'))
+      .catch(err => console.log('❌ SW failed:', err));
+  }
+// 🔁 CONFIG & STATE
+let currentMode = 'test';
+const API_BASE_URL = 'https://raven-internet.onrender.com';
+const PLANS = {
+  basic: { daily: { speed: '1 Mbps', data: '1 GB', price: 950, duration: '24 hours' }, weekly: { speed: '1.5 Mbps', data: '7 GB', price: 6500, duration: '7 days' }, monthly: { speed: '1.5 Mbps', data: '20 GB', price: 15000, duration: '30 days' } },
+  premium: { daily: { speed: '2 Mbps', data: '1 GB', price: 1200, duration: '24 hours' }, weekly: { speed: '2.5 Mbps', data: '7 GB', price: 8000, duration: '7 days' }, monthly: { speed: '3 Mbps', data: '30 GB', price: 25000, duration: '30 days' } }
+};
+const PHONE_CONFIG = { uganda: { code: '+256', networks: 'MTN or Airtel' }, kenya: { code: '+254', networks: 'M-Pesa or Airtel' }, tanzania: { code: '+255', networks: 'M-Pesa or Airtel' } };
+let selectedPlanType = 'basic', selectedDuration = 'daily', voucherCode = null;
+let currentSection = 'home';
+
+// 🧭 NAVIGATION
+function toggleNav() { document.querySelector('.nav-overlay').classList.toggle('open'); document.querySelector('.nav-drawer').classList.toggle('open'); }
+function navigate(section) { 
+  currentSection = section; 
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active')); 
+  document.getElementById(section).classList.add('active'); 
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
+  document.querySelector(`.nav-item[href="#${section}"]`)?.classList.add('active'); 
+  toggleNav(); 
+  if (section === 'news') loadNews(); 
+  if (section === 'home') checkAPK(); 
+  if (section === 'connection') refreshConnection();
+  if (section === 'my-vouchers') loadVouchers();
+}
+
+// 🔄 AUTO-SWITCH UI BASED ON BACKEND
+async function checkMode() {
+  try {
+    const r = await fetch(`${API_BASE_URL}/health`);
+    const d = await r.json();
+    currentMode = d.mode?.includes('TEST') ? 'test' : 'prod';
+    const banner = document.getElementById('testModeBanner');
+    const btn = document.getElementById('payButton');
+    if (currentMode === 'test') { banner.classList.remove('hidden'); btn.textContent = '🧪 Simulate Payment (Free)'; } 
+    else { banner.classList.add('hidden'); btn.textContent = '💳 Pay with Pesapal'; }
+  } catch (e) { console.warn('Mode check failed, defaulting to test'); }
+}
+
+// 💳 PLAN SELECTION
+function selectPlanType(type) { selectedPlanType = type; document.querySelectorAll('.plan-option').forEach(el => { el.classList.remove('active'); if (el.querySelector('h3').textContent.toLowerCase().includes(type)) el.classList.add('active'); }); updatePlanDisplay(); }
+function selectDuration(duration) { selectedDuration = duration; document.querySelectorAll('.duration-btn').forEach((el, idx) => { el.classList.remove('active'); if ((duration === 'daily' && idx === 0) || (duration === 'weekly' && idx === 1) || (duration === 'monthly' && idx === 2)) el.classList.add('active'); }); updatePlanDisplay(); }
+function updatePlanDisplay() { const p = PLANS[selectedPlanType][selectedDuration]; document.getElementById('planSpeed').textContent = p.speed; document.getElementById('planData').textContent = p.data; document.getElementById('planPrice').textContent = `UGX ${p.price.toLocaleString()}`; }
+
+// 📱 PHONE VALIDATION
+function detectCountry(phone) { const c = phone.replace(/[\s\-]/g, ''); if (/^07[0-9]{8}$/.test(c) || /^2567[0-9]{9}$/.test(c)) return 'uganda'; if (/^2547[0-9]{9}$/.test(c)) return 'kenya'; if (/^2557[0-9]{9}$/.test(c)) return 'tanzania'; return null; }
+function formatPhoneForPesapal(p) { p = p.replace(/[\s\-]/g, ''); if (p.startsWith('+')) p = p.substring(1); if (p.startsWith('00')) p = p.substring(2); if (p.startsWith('07') && p.length === 10) p = '256' + p.substring(1); return p; }
+function validatePhone() { const ph = document.getElementById('phoneNumber').value.trim(); const h = document.getElementById('paymentHint'); const b = document.getElementById('payButton'); if (!ph) { b.disabled = true; h.textContent = '🔒 Pesapal auto-detects MTN, Airtel, or M-Pesa'; h.className = 'payment-hint'; return; } const c = detectCountry(ph); if (!c) { b.disabled = true; h.textContent = '❌ Invalid. Use: 07XX... (UG) | 2547... (KE) | 2557... (TZ)'; h.className = 'payment-hint invalid'; return; } b.disabled = false; h.innerHTML = `✅ ${c.toUpperCase()} • ${PHONE_CONFIG[c].networks} supported<br><small>Pesapal will auto-detect</small>`; h.className = 'payment-hint valid'; }
+
+// 💸 HARDENED PAYMENT FLOW (CONNECTS TO BACKEND)
+async function initiatePayment() {
+  const ph = document.getElementById('phoneNumber').value;
+  const pl = PLANS[selectedPlanType][selectedDuration];
+  const btn = document.getElementById('payButton');
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span> Processing...';
+  
+  // ✅ Idempotency key prevents double charges
+  const idemKey = 'RVN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  
+  try {
+    const fp = formatPhoneForPesapal(ph);
+    const res = await fetch(`${API_BASE_URL}/api/v1/plans/purchase`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Idempotency-Key': idemKey },
+      body: JSON.stringify({ phone_number: fp, plan_id: `${selectedDuration}_${selectedPlanType}`, amount: pl.price })
+    });
+    const d = await res.json();
+    
+    if (d.status === 'SUCCESS') { onPaymentSuccess(d.voucher_code, pl.duration, pl.data); } 
+    else if (d.status === 'PENDING_REVIEW') { showToast('⏳ Payment processing. Check back shortly.', 'warning'); btn.disabled = false; btn.textContent = currentMode === 'test' ? '🧪 Simulate Payment (Free)' : '💳 Pay with Pesapal'; } 
+    else { showToast('❌ ' + (d.message || 'Payment failed'), 'error'); btn.disabled = false; btn.textContent = currentMode === 'test' ? '🧪 Simulate Payment (Free)' : '💳 Pay with Pesapal'; }
+  } catch (e) { showToast('❌ Network error. Check connection.', 'error'); btn.disabled = false; btn.textContent = currentMode === 'test' ? '🧪 Simulate Payment (Free)' : '💳 Pay with Pesapal'; }
+}
+
+// 📋 COPY & SAVE
+function copyCode() { const c = document.getElementById('voucherCode').textContent.trim(); const f = document.getElementById('copyFeedback'); if (navigator.clipboard) { navigator.clipboard.writeText(c).then(() => showCopy(f)).catch(() => legCopy(c, f)) } else { legCopy(c, f) } }
+function legCopy(t, f) { const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showCopy(f) } catch { f.textContent = '❌ Copy failed. Select manually.'; f.style.color = 'var(--danger)' } document.body.removeChild(ta) }
+function showCopy(f) { f.textContent = '✅ Code copied! Paste in Raven NetOps VPN app'; f.style.color = 'var(--success)'; setTimeout(() => f.textContent = '', 4000) }
+
+function onPaymentSuccess(c, d, dl) { 
+  voucherCode = c; 
+  document.getElementById('paymentSection').classList.add('hidden'); 
+  document.getElementById('voucherSection').classList.remove('hidden'); 
+  document.getElementById('voucherCode').textContent = c; 
+  document.getElementById('voucherDuration').textContent = d; 
+  document.getElementById('voucherData').textContent = dl; 
+  document.getElementById('smsPhone').textContent = document.getElementById('phoneNumber').value; 
+  if (currentMode === 'prod') document.getElementById('postPaymentApk').classList.remove('hidden'); 
+  
+  // ✅ Save locally for "My Vouchers"
+  const vouchers = JSON.parse(localStorage.getItem('raven_vouchers') || '[]');
+  vouchers.unshift({ code: c, duration: d, data: dl, expires: new Date(Date.now() + 24*60*60*1000).toISOString() });
+  localStorage.setItem('raven_vouchers', JSON.stringify(vouchers.slice(0, 5)));
+  
+  setTimeout(copyCode, 1000); 
+  window.scrollTo({ top: 0, behavior: 'smooth' }); 
+}
+
+function openApp() { window.location.href = voucherCode ? `raven://activate?code=${voucherCode}` : 'raven://'; }
+async function checkAPK() { if (currentMode === 'prod') { try { const i = await new Promise(r => { const ifr = document.createElement('iframe'); ifr.style.display = 'none'; ifr.src = 'raven://check'; document.body.appendChild(ifr); setTimeout(() => { r(!document.hasFocus()); document.body.removeChild(ifr); }, 1500) }); if (i) { document.getElementById('postPaymentApk').classList.add('hidden'); document.getElementById('apkSection').classList.add('hidden') } else { document.getElementById('postPaymentApk').classList.remove('hidden') } } catch { } } else { document.getElementById('apkSection').classList.remove('hidden'); } }
+
+// 📢 NEWS & UTILS
+async function loadNews() { const c = document.getElementById('newsContainer'); try { const r = await fetch(`${API_BASE_URL}/api/news`); const n = await r.json(); if (!n.length) { c.innerHTML = '<p style="color:var(--text-muted);text-align:center">No news yet.</p>'; return } c.innerHTML = ''; n.forEach(x => { const card = document.createElement('div'); card.className = 'news-card'; const t = document.createElement('h3'); t.textContent = x.title; const m = document.createElement('p'); m.textContent = x.message; const dt = document.createElement('div'); dt.className = 'date'; dt.textContent = new Date(x.created_at).toLocaleDateString(); card.append(t, m, dt); c.appendChild(card) }) } catch { c.innerHTML = '<p style="color:var(--danger)">Failed to load.</p>' } }
+function showToast(msg, type = 'info') { const ex = document.querySelector('.alert-toast'); if (ex) ex.remove(); const t = document.createElement('div'); t.className = 'alert-toast'; const i = document.createElement('span'); i.textContent = type === 'warning' ? '⚠️' : '✅'; const s = document.createElement('span'); s.textContent = msg; t.append(i, s); document.body.appendChild(t); setTimeout(() => t.remove(), 5000) }
+function requestPRO(pid) { const p = { 'pro_2m_30gb': 'PRO 30GB', 'pro_2m_50gb': 'PRO 50GB', 'pro_2m_60gb': 'PRO 60GB', 'annual_250gb': 'Annual 250GB', 'annual_450gb': 'Annual 450GB', 'annual_unlimited': 'Annual Unlimited' }; const ph = document.getElementById('phoneNumber')?.value || 'XXX'; const msg = `Hi! I want to purchase Raven NetOps VPN ${p[pid]}. Phone: ${ph}`; window.open(`https://wa.me/256741227707?text=${encodeURIComponent(msg)}`, '_blank') }
+function refreshConnection() { const s = JSON.parse(localStorage.getItem('raven_session') || '{}'); if (s.active) { document.getElementById('connectionStatus').style.display = 'block'; document.getElementById('connectionNotActive').style.display = 'none'; document.getElementById('connUsed').textContent = `${s.used_mb || 0} MB`; document.getElementById('connLeft').textContent = `${s.remaining_mb || 0} MB`; document.getElementById('connSpeed').textContent = `${s.speed_mbps || 1} Mbps`; document.getElementById('connExpiry').textContent = s.expires_at ? new Date(s.expires_at).toLocaleString() : '—' } else { document.getElementById('connectionStatus').style.display = 'none'; document.getElementById('connectionNotActive').style.display = 'block' } }
+function trackVisit() { const id = localStorage.getItem('raven_anon_visit_id'); if (id) return; const nid = crypto.randomUUID(); localStorage.setItem('raven_anon_visit_id', nid); const d = /Android/i.test(navigator.userAgent) ? 'android' : /iPhone/i.test(navigator.userAgent) ? 'ios' : 'desktop'; navigator.sendBeacon(`${API_BASE_URL}/api/analytics/track`, JSON.stringify({ anon_id: nid, device: d })) }
+
+// 🎫 LOCAL VOUCHERS & SETTINGS (NO LOGIN)
+function loadVouchers(){const list=document.getElementById('vouchersList');const vouchers=JSON.parse(localStorage.getItem('raven_vouchers')||'[]');if(!vouchers.length){list.innerHTML='<p style="color:var(--text-muted);text-align:center">No active vouchers. Buy a plan to get started.</p>';return}list.innerHTML=vouchers.map(v=>`<div style="background:var(--bg);padding:12px;border-radius:8px;margin-bottom:8px"><strong>${v.code}</strong><br><small>Expires: ${new Date(v.expires).toLocaleDateString()}</small><br><span style="color:var(--success)">Active</span></div>`).join('');}
+function toggleTheme(){const t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('raven_theme',t);}
+function showAbout(){alert('Raven NetOps VPN v1.0.1\n\nBuilt for East Africa.\nAuto-Switch Architecture Active.\n\n🦅 Secure • Fast • No Logs');}
+function showWhatsNew(){alert('🆕 What\'s New in v1.0.1:\n\n✅ Auto-Switch Test/Live Mode\n✅ Idempotent Payments (no double charges)\n✅ E.164 Phone Support (UG, KE, TZ, RW, SS)\n✅ Rune Language Preview\n✅ Faster PWA + APK\n\nComing Soon: Loyalty Program, Referrals');}
+
+window.addEventListener('load', () => { updatePlanDisplay(); checkMode(); checkAPK(); trackVisit(); const t=localStorage.getItem('raven_theme'); if(t) document.documentElement.setAttribute('data-theme',t); const u = new URLSearchParams(window.location.search).get('voucher'); if (u) onPaymentSuccess(u, '24h', '1GB') });
+</script>
+</body>
+</html>
