@@ -27,13 +27,15 @@ def create_app():
     migrate.init_app(app, db)
     limiter.init_app(app)
     jwt.init_app(app)
-    
-    CORS(app, 
-         origins=['https://ravenj-png.github.io', 'https://raven-internet.onrender.com'],
-         supports_credentials=True,
-         allow_headers=['Content-Type', 'Authorization', 'X-Admin-Token', 'X-Idempotency-Key'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
-         
+ 
+# ✅ CORS FIX: Explicitly allow origins + methods + headers
+CORS(app, 
+     origins=['https://ravenj-png.github.io', 'https://raven-internet.onrender.com'],
+     supports_credentials=True,
+     allow_headers=['Content-Type', 'Authorization', 'X-Admin-Token', 'X-Idempotency-Key', 'X-Requested-With'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  # ← Ensure OPTIONS is included
+     expose_headers=['X-Request-ID']
+)         
     if not app.debug:
         Talisman(app, force_https=True, session_cookie_secure=True, frame_options='DENY')
     
