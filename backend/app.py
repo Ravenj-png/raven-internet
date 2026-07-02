@@ -28,7 +28,7 @@ def create_app():
     limiter.init_app(app)
     jwt.init_app(app)
     
-    # ✅ CORS FIX — Allow everything for GitHub Pages
+    # ✅ CORS FIX
     CORS(app, 
          origins=['https://ravenj-png.github.io', 'https://raven-internet.onrender.com'],
          supports_credentials=True,
@@ -37,7 +37,6 @@ def create_app():
          expose_headers=['X-Request-ID']
     )
 
-    # ✅ MANUAL CORS FALLBACK (catches preflight)
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -48,7 +47,6 @@ def create_app():
     if not app.debug:
         Talisman(app, force_https=True, session_cookie_secure=True, frame_options='DENY')
     
-    # Initialize Services
     from services.wireguard_service import WireGuardService
     from services.payment_service import PaymentService
     from services.mikrotik_service import MikroTikService
@@ -59,7 +57,6 @@ def create_app():
     MikroTikService(app)
     SMSService(app)
     
-    # Register Blueprints
     app.register_blueprint(plans_bp)
     app.register_blueprint(vouchers_bp)
     app.register_blueprint(session_bp)
@@ -71,7 +68,6 @@ def create_app():
     app.register_blueprint(security_bp)
     app.register_blueprint(rune_bp)
     
-    # REQUEST ID MIDDLEWARE
     @app.before_request
     def attach_request_id():
         g.request_id = f"RVNREQ-{datetime.datetime.utcnow().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
@@ -81,7 +77,6 @@ def create_app():
         response.headers['X-Request-ID'] = getattr(g, 'request_id', 'N/A')
         return response
 
-    # HEALTH CHECK
     @app.route('/health')
     def health():
         try:
@@ -105,7 +100,6 @@ def create_app():
             'version': 'R V1.0.1'
         }), 200 if db_ok else 503
 
-    # SYSTEM INFO
     START_TIME = time.time()
     
     @app.route('/api/v1/system/info')
@@ -135,7 +129,6 @@ def create_app():
     def not_found(e):
         return jsonify({'message': 'Not found', 'request_id': getattr(g, 'request_id', None)}), 404
 
-    # LOGGING SETUP
     if not os.path.exists('logs'):
         os.mkdir('logs')
     fh = logging.FileHandler('logs/raven.log')
@@ -158,13 +151,26 @@ def create_app():
 
 app = create_app()
 
+# ✅ AUTO-FIX MISSING COLUMNS + CREATE TABLES
 with app.app_context():
     from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog, AuditLog
     try:
+        from sqlalchemy import inspect
+        
+        # Check if phone_number exists in transactions
+        inspector = inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns('transactions')]
+        
+        if 'phone_number' not in columns:
+            app.logger.info("⚠️ Missing phone_number column — adding it...")
+            db.session.execute('ALTER TABLE transactions ADD COLUMN phone_number VARCHAR(20) NOT NULL DEFAULT ""')
+            db.session.commit()
+            app.logger.info("✅ phone_number column added")
+        
         db.create_all()
         app.logger.info("✅ Database tables created/verified")
     except Exception as e:
-        app.logger.warning(f"⚠️ DB note: {e}")
+        app.logger.error(f"❌ Database error: {str(e)}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=app.config.get('DEBUG', False))
