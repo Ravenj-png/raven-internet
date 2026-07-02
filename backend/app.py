@@ -13,7 +13,12 @@ from routes.notifications import notifications_bp
 from routes.analytics import analytics_bp
 from routes.security import security_bp
 from routes.rune import rune_bp
-import logging, os, json, time, uuid, datetime
+import logging
+import os
+import json
+import time
+import uuid
+import datetime
 
 def create_app():
     app = Flask(__name__)
@@ -103,7 +108,8 @@ def create_app():
         try:
             db.session.execute('SELECT 1')
             db_ok = True
-        except: pass
+        except:
+            pass
         
         router_ok = is_router_online()
         pesapal_ok = bool(PESAPAL_KEY and PESAPAL_SECRET)
@@ -120,11 +126,10 @@ def create_app():
     def not_found(e):
         return jsonify({'message': 'Not found', 'request_id': getattr(g, 'request_id', None)}), 404
 
-        # Logging Setup (✅ FIXED: Safe request_id fallback)
+    # ✅ LOGGING SETUP (Moved inside create_app)
     if not os.path.exists('logs'):
         os.mkdir('logs')
     fh = logging.FileHandler('logs/raven.log')
-    # ✅ Use %(request_id)s with fallback via logging filter
     fh.setFormatter(logging.Formatter('%(asctime)s %(levelname)s [%(request_id)s]: %(message)s'))
     
     # ✅ Add filter to inject request_id safely
@@ -148,7 +153,7 @@ with app.app_context():
         db.create_all()
         app.logger.info("✅ Database tables created/verified")
     except Exception as e:
-        app.logger.warning(f"️ DB note: {e}")
+        app.logger.warning(f"⚠️ DB note: {e}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=app.config.get('DEBUG', False))
