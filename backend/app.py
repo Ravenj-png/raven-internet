@@ -152,7 +152,7 @@ def create_app():
 
 app = create_app()
 
-# ✅ AUTO-FIX MISSING COLUMNS + CREATE TABLES
+# ✅ AUTO-FIX ALL MISSING COLUMNS + CREATE TABLES
 with app.app_context():
     from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog, AuditLog
     try:
@@ -162,54 +162,29 @@ with app.app_context():
         if inspector.has_table('transactions'):
             columns = [col['name'] for col in inspector.get_columns('transactions')]
             
-            # ✅ Add phone_number if missing
-            if 'phone_number' not in columns:
-                app.logger.info("⚠️ Missing phone_number column — adding it...")
-                db.session.execute(text('ALTER TABLE transactions ADD COLUMN phone_number VARCHAR(20) NOT NULL DEFAULT \'\''))
-                db.session.commit()
-                app.logger.info("✅ phone_number column added")
-            else:
-                app.logger.info("✅ phone_number column already exists")
+            # ALL columns that should exist in the transactions table
+            columns_to_add = [
+                ('phone_number', 'VARCHAR(20) NOT NULL DEFAULT \'\''),
+                ('voucher_code', 'VARCHAR(20) DEFAULT NULL'),
+                ('merchant_reference', 'VARCHAR(100) DEFAULT NULL'),
+                ('idempotency_key', 'VARCHAR(100) DEFAULT NULL'),
+                ('is_test', 'BOOLEAN DEFAULT FALSE'),
+                ('created_at', 'TIMESTAMP WITH TIME ZONE DEFAULT NOW()'),
+                ('paid_at', 'TIMESTAMP WITH TIME ZONE DEFAULT NULL')   # ← added for admin stats
+            ]
             
-            # ✅ Add voucher_code if missing
-            if 'voucher_code' not in columns:
-                app.logger.info("⚠️ Missing voucher_code column — adding it...")
-                db.session.execute(text('ALTER TABLE transactions ADD COLUMN voucher_code VARCHAR(20) DEFAULT NULL'))
-                db.session.commit()
-                app.logger.info("✅ voucher_code column added")
-            else:
-                app.logger.info("✅ voucher_code column already exists")
-            
-            # ✅ Add merchant_reference if missing
-            if 'merchant_reference' not in columns:
-                app.logger.info("⚠️ Missing merchant_reference column — adding it...")
-                db.session.execute(text('ALTER TABLE transactions ADD COLUMN merchant_reference VARCHAR(100) DEFAULT NULL'))
-                db.session.commit()
-                app.logger.info("✅ merchant_reference column added")
-            else:
-                app.logger.info("✅ merchant_reference column already exists")
-                
-            # ✅ Add idempotency_key if missing
-            if 'idempotency_key' not in columns:
-                app.logger.info("⚠️ Missing idempotency_key column — adding it...")
-                db.session.execute(text('ALTER TABLE transactions ADD COLUMN idempotency_key VARCHAR(100) DEFAULT NULL'))
-                db.session.commit()
-                app.logger.info("✅ idempotency_key column added")
-            else:
-                app.logger.info("✅ idempotency_key column already exists")
-                
-            # ✅ Add is_test if missing
-            if 'is_test' not in columns:
-                app.logger.info("⚠️ Missing is_test column — adding it...")
-                db.session.execute(text('ALTER TABLE transactions ADD COLUMN is_test BOOLEAN DEFAULT FALSE'))
-                db.session.commit()
-                app.logger.info("✅ is_test column added")
-            else:
-                app.logger.info("✅ is_test column already exists")
+            for col_name, col_def in columns_to_add:
+                if col_name not in columns:
+                    app.logger.info(f"⚠️ Missing {col_name} column — adding it...")
+                    db.session.execute(text(f'ALTER TABLE transactions ADD COLUMN {col_name} {col_def}'))
+                    db.session.commit()
+                    app.logger.info(f"✅ {col_name} column added")
+                else:
+                    app.logger.info(f"✅ {col_name} column already exists")
         else:
             app.logger.info("⚠️ transactions table does not exist — will create all tables")
         
-        # Create any missing tables
+        # Create any missing tables (e.g., if the transactions table was missing entirely)
         db.create_all()
         app.logger.info("✅ Database tables created/verified")
     except Exception as e:
