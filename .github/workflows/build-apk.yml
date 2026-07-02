@@ -18,13 +18,19 @@ jobs:
         with:
           flutter-version: '3.44.0'
 
+      - name: Regenerate Android folder
+        run: |
+          rm -rf android
+          flutter create .
+        working-directory: ./apk
+
       - name: Install dependencies
         run: flutter pub get
-        working-directory: ./apk          # ✅ points to the right folder
+        working-directory: ./apk
 
       - name: Build APK
         run: flutter build apk --release
-        working-directory: ./apk          # ✅ builds inside apk/
+        working-directory: ./apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
