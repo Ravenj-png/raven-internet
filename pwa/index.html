@@ -300,6 +300,13 @@
   </div>
 
 <script>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ Service Worker registered'))
+      .catch(err => console.log('❌ SW failed:', err));
+  }
 // 🔁 CONFIG & STATE
 let currentMode = 'test';
 const API_BASE_URL = 'https://raven-internet.onrender.com';
