@@ -15,7 +15,6 @@ from routes.security import security_bp
 from routes.rune import rune_bp
 import logging
 import os
-import json
 import time
 import uuid
 import datetime
@@ -29,7 +28,6 @@ def create_app():
     limiter.init_app(app)
     jwt.init_app(app)
     
-    # ✅ CORS FIX: Explicitly allow origins + preflight
     CORS(app, 
          origins=['https://ravenj-png.github.io', 'https://raven-internet.onrender.com'],
          supports_credentials=True,
@@ -69,10 +67,10 @@ def create_app():
 
     @app.after_request
     def add_request_id_header(response):
-        response.headers['X-Request-ID'] = g.request_id
+        response.headers['X-Request-ID'] = getattr(g, 'request_id', 'N/A')
         return response
 
-    # ✅ HEALTH CHECK (Auto-Switch Aware)
+    # ✅ HEALTH CHECK
     @app.route('/health')
     def health():
         try:
@@ -96,7 +94,7 @@ def create_app():
             'version': 'R V1.0.1'
         }), 200 if db_ok else 503
 
-    # ✅ SYSTEM INFO ENDPOINT (Monitoring)
+    # ✅ SYSTEM INFO
     START_TIME = time.time()
     
     @app.route('/api/v1/system/info')
@@ -126,19 +124,22 @@ def create_app():
     def not_found(e):
         return jsonify({'message': 'Not found', 'request_id': getattr(g, 'request_id', None)}), 404
 
-    # ✅ LOGGING SETUP (Moved inside create_app)
+    # ✅ LOGGING SETUP (FIXED: Safe request_id fallback)
     if not os.path.exists('logs'):
         os.mkdir('logs')
     fh = logging.FileHandler('logs/raven.log')
     fh.setFormatter(logging.Formatter('%(asctime)s %(levelname)s [%(request_id)s]: %(message)s'))
     
-    # ✅ Add filter to inject request_id safely
+    # ✅ CRITICAL FIX: Safe filter that never fails
     class RequestIDFilter(logging.Filter):
         def filter(self, record):
-            record.request_id = getattr(g, 'request_id', 'N/A')
+            try:
+                record.request_id = getattr(g, 'request_id', 'N/A')
+            except Exception:
+                record.request_id = 'N/A'
             return True
-    fh.addFilter(RequestIDFilter())
     
+    fh.addFilter(RequestIDFilter())
     app.logger.addHandler(fh)
     app.logger.setLevel(logging.INFO)
     app.logger.info("Raven NetOps VPN backend initialized")
@@ -147,6 +148,7 @@ def create_app():
 
 app = create_app()
 
+# ✅ DATABASE INITIALIZATION (MOVED INSIDE APP CONTEXT)
 with app.app_context():
     from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog, AuditLog
     try:
