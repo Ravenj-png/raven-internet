@@ -299,14 +299,40 @@
     <div class="footer">© 2026 Raven NetOps VPN • <a href="./howto.html" target="_blank">How to Use</a> • <a href="./privacy.html" target="_blank">Privacy</a> • <a href="./terms.html" target="_blank">Terms</a> • <a href="./rules.html" target="_blank">Rules</a></div>
   </div>
 
+<!-- PWA Install Button -->
+<div id="installContainer" style="display:none;position:fixed;bottom:20px;right:20px;z-index:1000;">
+  <button id="installBtn" onclick="installPWA()" style="background:#3b82f6;color:white;border:none;padding:12px 24px;border-radius:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,0.4);display:flex;align-items:center;gap:8px;">
+    <span>📥</span>
+    <span>Install Raven VPN</span>
+  </button>
+</div>
+
 <script>
-// ✅ Register Service Worker for PWA Installation
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(reg => console.log('✅ SW registered:', reg.scope))
-    .catch(err => console.log('❌ SW failed:', err));
+// PWA Install Logic
+let deferredPrompt;
+const installContainer = document.getElementById('installContainer');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installContainer.style.display = 'block';
+});
+
+async function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    installContainer.style.display = 'none';
+  }
+  deferredPrompt = null;
 }
 
+window.addEventListener('appinstalled', () => {
+  installContainer.style.display = 'none';
+  console.log('✅ PWA installed');
+});
+  
 //  CONFIG & STATE
 let currentMode = 'test';
 const API_BASE_URL = 'https://raven-internet.onrender.com';
