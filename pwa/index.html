@@ -83,6 +83,10 @@
     .pro-card h2{color:var(--warning)}
     .annual-card{border:2px solid #8b5cf6}
     .annual-card h2{color:#8b5cf6}
+    /* One‑line cards */
+    .info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:12px;text-align:center}
+    .info-card p{font-size:13px;color:var(--text-muted);margin:0}
+    .info-card strong{color:var(--text)}
     #installContainer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:1000;width:90%;max-width:400px}
     #installBtn{width:100%;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border:none;padding:16px 24px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(59,130,246,0.5);display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px;transition:all.3s}
     #installBtn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(59,130,246,0.6)}
@@ -238,6 +242,19 @@
         </div>
       </div>
 
+      <!-- ====== ONE-LINE CARDS ====== -->
+      <div class="info-card">
+        <p>🦅 <strong>Raven NetOps VPN</strong> — Fast, secure internet for East Africa students.</p>
+      </div>
+
+      <div class="info-card">
+        <p>🆕 <strong>v1.0.1</strong> — Auto-Switch Test/Live Mode, E.164 Phone Support, Rune Language Preview.</p>
+      </div>
+
+      <div class="info-card">
+        <p>© 2026 <strong>Raven NetOps VPN</strong>. All rights reserved. Licensed under MIT.</p>
+      </div>
+
       <div class="card" style="margin-top:24px;text-align:center">
         <h3>🆘 Need Help?</h3>
         <p style="color:var(--text-muted);margin-bottom:16px">We're here for you. Reach out anytime:</p>
@@ -281,7 +298,9 @@
     <div id="payment-history" class="page-section">
       <div class="card">
         <h2>💳 Payment History</h2>
-        <p style="color:var(--text-muted);text-align:center;margin-bottom:16px">For privacy, Raven doesn't store payment history on our servers.</p>
+        <div class="info-card" style="margin-bottom:16px;">
+          <p>💳 <strong>Payment History</strong> — Check your mobile money SMS or contact support for transaction help.</p>
+        </div>
         <div style="background:var(--bg);padding:16px;border-radius:10px;margin-bottom:12px">
           <strong>How to track payments:</strong>
           <ul style="margin-top:8px;padding-left:20px;color:var(--text-muted);font-size:14px">
@@ -349,7 +368,12 @@ window.addEventListener('appinstalled', () => {
   installContainer.style.display = 'none';
   console.log('✅ PWA installed');
 });
-  
+
+// If already installed, hide the button
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  document.getElementById('installContainer').style.display = 'none';
+}
+
 //  CONFIG & STATE
 let currentMode = 'test';
 let selectedCountry = 'ug';
