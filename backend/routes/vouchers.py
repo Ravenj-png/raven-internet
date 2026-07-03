@@ -16,21 +16,17 @@ def activate():
     d = request.json or {}
     code = sanitize_input(d.get('voucher_code', '')).upper()
     
-    # ✅ Validate format
     if not validate_voucher_code(code):
         return jsonify({'message': 'Invalid format'}), 400
     
-    # ✅ Check if voucher exists and is not used
     v = Voucher.query.filter_by(code=code, is_used=False).first()
     if not v or v.expires_at < dt.datetime.utcnow():
         return jsonify({'message': 'Invalid/Expired'}), 404
     
-    # ✅ Get phone number from request
     ph = d.get('phone_number')
     if not ph:
         return jsonify({'message': 'Phone number required'}), 400
     
-    # ✅ Find or create student
     s = Student.query.filter_by(phone_hash=hash_phone(ph)).first()
     if not s:
         s = Student()
@@ -41,13 +37,11 @@ def activate():
     if s.is_blocked:
         return jsonify({'message': 'Blocked'}), 403
     
-    # ✅ Mark voucher as used
+    # ✅ Mark voucher as used (no used_by)
     v.is_used = True
-    v.used_by = s.id  # ✅ Add this field to your Voucher model if it doesn't exist
     db.session.commit()
     
-    # ✅ Generate JWT and config (simplified)
-    # You'll need to implement actual config generation here
+    # ✅ Generate dummy config (you can replace with real config later)
     config = f"[Interface]\nPrivateKey = dummy\nAddress = 10.0.0.2/32\nDNS = 8.8.8.8\n\n[Peer]\nPublicKey = dummy\nEndpoint = dummy:51820\nAllowedIPs = 0.0.0.0/0"
     
     return jsonify({
