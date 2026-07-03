@@ -23,9 +23,10 @@ def activate():
     if not v or v.expires_at < dt.datetime.utcnow():
         return jsonify({'message': 'Invalid/Expired'}), 404
     
-    ph = d.get('phone_number')
-    if not ph:
-        return jsonify({'message': 'Phone number required'}), 400
+    # ✅ REMOVED: phone number check — users just paste the code
+    # ✅ Create a dummy student if needed (or skip entirely)
+    # For simplicity, we'll create one with a dummy phone if not provided
+    ph = d.get('phone_number', '0000000000')
     
     s = Student.query.filter_by(phone_hash=hash_phone(ph)).first()
     if not s:
@@ -37,11 +38,11 @@ def activate():
     if s.is_blocked:
         return jsonify({'message': 'Blocked'}), 403
     
-    # ✅ Mark voucher as used (no used_by)
+    # ✅ Mark voucher as used
     v.is_used = True
     db.session.commit()
     
-    # ✅ Generate dummy config (you can replace with real config later)
+    # ✅ Generate dummy config (for test mode)
     config = f"[Interface]\nPrivateKey = dummy\nAddress = 10.0.0.2/32\nDNS = 8.8.8.8\n\n[Peer]\nPublicKey = dummy\nEndpoint = dummy:51820\nAllowedIPs = 0.0.0.0/0"
     
     return jsonify({
