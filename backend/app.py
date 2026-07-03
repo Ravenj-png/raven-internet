@@ -151,7 +151,7 @@ def create_app():
 
 app = create_app()
 
-# ✅ AUTO-FIX MISSING COLUMNS IN BOTH TABLES
+# ✅ AUTO-FIX MISSING COLUMNS IN ALL TABLES
 with app.app_context():
     from models import Student, Session, Transaction, Voucher, News, Notification, FailedAttempt, VisitorLog, AuditLog
     try:
@@ -197,6 +197,19 @@ with app.app_context():
                     app.logger.info(f"✅ {col_name} already exists in vouchers")
         else:
             app.logger.info("⚠️ vouchers table does not exist — will create all tables")
+
+        # ---- Fix sessions table (ADD DEVICE_ID) ----
+        if inspector.has_table('sessions'):
+            columns = [col['name'] for col in inspector.get_columns('sessions')]
+            if 'device_id' not in columns:
+                app.logger.info("⚠️ Missing device_id in sessions — adding...")
+                db.session.execute(text('ALTER TABLE sessions ADD COLUMN device_id VARCHAR(100) DEFAULT NULL'))
+                db.session.commit()
+                app.logger.info("✅ device_id added to sessions")
+            else:
+                app.logger.info("✅ device_id already exists in sessions")
+        else:
+            app.logger.info("⚠️ sessions table does not exist — will create all tables")
         
         # Create any missing tables
         db.create_all()
