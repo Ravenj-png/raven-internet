@@ -198,9 +198,11 @@ with app.app_context():
         else:
             app.logger.info("⚠️ vouchers table does not exist — will create all tables")
 
-        # ---- Fix sessions table (ADD DEVICE_ID) ----
+        # ---- Fix sessions table (ADD device_id AND created_at) ----
         if inspector.has_table('sessions'):
             columns = [col['name'] for col in inspector.get_columns('sessions')]
+            
+            # Add device_id if missing
             if 'device_id' not in columns:
                 app.logger.info("⚠️ Missing device_id in sessions — adding...")
                 db.session.execute(text('ALTER TABLE sessions ADD COLUMN device_id VARCHAR(100) DEFAULT NULL'))
@@ -208,6 +210,15 @@ with app.app_context():
                 app.logger.info("✅ device_id added to sessions")
             else:
                 app.logger.info("✅ device_id already exists in sessions")
+            
+            # Add created_at if missing
+            if 'created_at' not in columns:
+                app.logger.info("⚠️ Missing created_at in sessions — adding...")
+                db.session.execute(text('ALTER TABLE sessions ADD COLUMN created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()'))
+                db.session.commit()
+                app.logger.info("✅ created_at added to sessions")
+            else:
+                app.logger.info("✅ created_at already exists in sessions")
         else:
             app.logger.info("⚠️ sessions table does not exist — will create all tables")
         
