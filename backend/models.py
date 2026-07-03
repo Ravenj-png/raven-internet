@@ -28,6 +28,7 @@ class Session(db.Model):
     speed_mbps = db.Column(db.Integer, default=1)
     expires_at = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
+    device_id = db.Column(db.String(100), nullable=True)   # ✅ ADDED FOR ONE‑DEVICE ENFORCEMENT
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
 
 class Transaction(db.Model):
