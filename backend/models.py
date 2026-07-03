@@ -19,7 +19,7 @@ class Session(db.Model):
     __tablename__ = 'sessions'
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'))
-    session_token = db.Column(db.String(100), unique=True)
+    session_token = db.Column(db.Text)  # ✅ FIXED: Text instead of String(255)
     voucher_code = db.Column(db.String(20), unique=True)
     public_key = db.Column(db.String(100))
     allowed_ip = db.Column(db.String(50))
@@ -28,7 +28,7 @@ class Session(db.Model):
     speed_mbps = db.Column(db.Integer, default=1)
     expires_at = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
-    device_id = db.Column(db.String(100), nullable=True)   # ✅ ADDED FOR ONE‑DEVICE ENFORCEMENT
+    device_id = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
 
 class Transaction(db.Model):
@@ -55,9 +55,6 @@ class Voucher(db.Model):
     code = db.Column(db.String(20), unique=True)
     plan_id = db.Column(db.String(50))
     is_used = db.Column(db.Boolean, default=False)
-    # ❌ used_by temporarily removed to fix the activation error
-    # You can add it back later with a proper migration: 
-    # used_by = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=True)
     expires_at = db.Column(db.DateTime)
     is_test = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
@@ -103,5 +100,5 @@ class AuditLog(db.Model):
     action = db.Column(db.String(50))
     phone = db.Column(db.String(20))
     plan_id = db.Column(db.String(50))
-    extra_data = db.Column(db.JSON)  # ✅ Renamed from 'metadata'
+    extra_data = db.Column(db.JSON)
     timestamp = db.Column(db.DateTime, default=dt.datetime.utcnow)
