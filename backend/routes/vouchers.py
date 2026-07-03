@@ -10,8 +10,8 @@ import datetime as dt
 vouchers_bp = Blueprint('vouchers', __name__, url_prefix='/api/vouchers')
 
 @vouchers_bp.route('/activate', methods=['POST'])
-@limiter.limit("5 per minute")
-@limiter.limit("20 per hour")
+#@limiter.limit("5 per minute")
+#@limiter.limit("20 per hour")
 def activate():
     d = request.json or {}
     code = sanitize_input(d.get('voucher_code', '')).upper()
