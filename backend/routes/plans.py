@@ -50,7 +50,7 @@ def purchase_plan():
 
     # 4. STATE TRANSITION → FINALITY
     plan = PLANS.get(txn.plan_id)
-    plan_hours = plan['hours'] if plan else 24  # ✅ Get correct duration
+    plan_hours = plan['hours'] if plan else 24  # ✅ Correct duration
 
     if result['status'] == 'SUCCESS':
         txn.status = 'SUCCESS'
@@ -86,7 +86,7 @@ def generate_voucher_code(plan_id, is_test, hours):
                 code=code,
                 plan_id=plan_id,
                 is_test=is_test,
-                expires_at=dt.datetime.utcnow() + dt.timedelta(hours=hours)  # ✅ CORRECT expiry
+                expires_at=dt.datetime.utcnow() + dt.timedelta(hours=hours)
             )
             db.session.add(v)
             db.session.commit()
