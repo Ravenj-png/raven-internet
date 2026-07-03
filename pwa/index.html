@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0b1120">
-  <title>Raven NetOps VPN - Fast Internet Anywhere</title>
+  <title>RAVEN NET-OPS - Fast Internet Anywhere</title>
   <link rel="manifest" href="./manifest.json">
   <style>
     :root{--bg:#0b1120;--card:#1e293b;--primary:#3b82f6;--success:#10b981;--text:#f8fafc;--text-muted:#94a3b8;--border:#334155;--warning:#f59e0b;--danger:#ef4444}
@@ -96,7 +96,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🦅 RAVEN NETOPS VPN</h1>
+      <h1>🦅 RAVEN NET-OPS</h1>
       <button class="hamburger" onclick="toggleNav()">☰</button>
     </div>
 
@@ -104,7 +104,7 @@
     <div class="nav-drawer">
       <button class="nav-close" onclick="toggleNav()">✕</button>
       <div style="padding:12px 0 20px;border-bottom:1px solid var(--border);margin-bottom:16px">
-        <h2 style="font-size:18px;color:var(--primary);margin:0">🦅 RAVEN NETOPS VPN</h2>
+        <h2 style="font-size:18px;color:var(--primary);margin:0">🦅 RAVEN NET-OPS</h2>
         <p style="font-size:12px;color:var(--text-muted);margin:4px 0 0">East Africa's Student Internet</p>
         <span style="display:inline-block;background:var(--bg);color:var(--text-muted);padding:2px 8px;border-radius:12px;font-size:10px;margin-top:8px">v1.0.1 • Stable</span>
       </div>
@@ -145,16 +145,30 @@
       <a href="#" class="nav-item" onclick="alert('© 2026 Raven NetOps VPN. Built for East Africa.')">© Copyright</a>
       
       <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);text-align:center">
-        <p style="font-size:11px;color:var(--text-muted);margin:0">🦅 Built for East Africa • Secure • No Logs</p>
+        <p style="font-size:11px;color:var(--text-muted);margin:0">Built for East Africa • Secure • No Logs</p>
       </div>
     </div>
 
     <div id="home" class="page-section active">
+      <!-- ====== APK DOWNLOAD CARD ====== -->
       <div id="apkSection" class="card hidden">
-        <h2>📲 Install Raven NetOps VPN App</h2>
-        <div class="apk-section"><p>Download and install the Raven NetOps VPN app to get started</p>
-        <a href="https://your-server.com/raven-vpn.apk" class="btn btn-primary">📥 Download APK (18 MB)</a>
-        <p style="margin-top:12px;font-size:12px">Android 8.0+ required</p></div>
+        <h2> Install RAVEN NET-OPS App</h2>
+        <div class="apk-section">
+          <p>Download and install the RAVEN NET-OPS VPN app to get started</p>
+          <a href="https://github.com/Ravenj-png/raven-internet/releases/download/v1.0.0/app-release.apk" class="btn btn-primary" target="_blank">
+            Download APK (52 MB)
+          </a>
+          <p style="margin-top:12px;font-size:12px">Android 8.0+ required</p>
+        </div>
+      </div>
+
+      <!-- ====== JOIN COMMUNITY CARD ====== -->
+      <div class="card" style="margin-bottom:20px;">
+        <h2> Join Our Community</h2>
+        <p style="color:var(--text-muted);margin-bottom:16px;font-size:14px;">Connect with other students, get support, and stay updated.</p>
+        <a href="https://chat.whatsapp.com/BlyAUmPahGe99iibzhbhba" class="btn" style="background:#25D366;color:white;border:none;" target="_blank">
+          💬 Join WhatsApp Community
+        </a>
       </div>
 
       <div id="paymentSection" class="card">
@@ -163,8 +177,8 @@
           <span>🔒 Secure Pesapal</span><span>⚡ Instant Activation</span><span>💬 WhatsApp Support</span><span>🛡️ No Logs</span>
         </div>
         <div class="plan-toggle">
-          <div class="plan-option active" onclick="selectPlanType('basic')"><h3>🟦 Basic</h3><p>1 Mbps Speed</p></div>
-          <div class="plan-option" onclick="selectPlanType('premium')"><h3>🟪 Premium</h3><p>2 Mbps Speed</p></div>
+          <div class="plan-option active" onclick="selectPlanType('basic')"><h3> Basic</h3><p>1 Mbps Speed</p></div>
+          <div class="plan-option" onclick="selectPlanType('premium')"><h3> Premium</h3><p>2 Mbps Speed</p></div>
         </div>
         <div class="duration-grid">
           <button class="duration-btn active" onclick="selectDuration('daily')">Daily</button>
@@ -207,9 +221,9 @@
         </div>
         <button class="btn btn-success" onclick="copyCode()" style="margin-bottom:20px">📋 Copy Code to Clipboard</button>
         <div id="postPaymentApk" class="apk-section hidden">
-          <h3>📥 Download Raven NetOps VPN App</h3>
+          <h3>Download RAVEN NET-OPS App</h3>
           <p>You need the app to use this voucher code</p>
-          <a href="https://your-server.com/raven-vpn.apk" class="btn btn-primary"> Download APK</a>
+          <a href="https://github.com/Ravenj-png/raven-internet/releases/download/v1.0.0/app-release.apk" class="btn btn-primary" target="_blank">Download APK</a>
           <ul class="steps">
             <li><span class="step-num">1</span><span>Download & install</span></li>
             <li><span class="step-num">2</span><span>Open app & paste code</span></li>
@@ -218,40 +232,40 @@
         </div>
         <div class="apk-section" style="background:var(--card);margin-top:16px">
           <h3> Already Have the App?</h3>
-          <p>Open Raven NetOps VPN and paste your code</p>
-          <button class="btn btn-primary" onclick="openApp()">🚀 Open Raven NetOps VPN</button>
+          <p>Open RAVEN NET-OPS and paste your code</p>
+          <button class="btn btn-primary" onclick="openApp()"> Open RAVEN NET-OPS</button>
         </div>
-        <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">📲 Code also sent to <strong id="smsPhone">your phone</strong> via SMS</p>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted)">Code also sent to <strong id="smsPhone">your phone</strong> via SMS</p>
       </div>
 
       <div id="proSection" class="card pro-card" style="margin-top:24px">
-        <h2>🔥 Raven PRO & Annual Plans</h2>
+        <h2> Raven PRO & Annual Plans</h2>
         <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px">Manual approval required. Perfect for heavy users & long-term savings.</p>
-        <h3 style="margin:20px 0 12px;color:var(--text)">🚀 PRO Bundles (2 Months)</h3>
+        <h3 style="margin:20px 0 12px;color:var(--text)">PRO Bundles (2 Months)</h3>
         <div class="duration-grid">
-          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_30gb')"><h3>🟨 PRO 30</h3><p>30 GB • 4 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 30,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
-          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_50gb')"><h3>🟨 PRO 50</h3><p>50 GB • 6 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 70,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
-          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_60gb')"><h3>🟨 PRO 60</h3><p>60 GB • 10 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 95,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
+          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_30gb')"><h3> PRO 30</h3><p>30 GB • 4 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 30,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
+          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_50gb')"><h3> PRO 50</h3><p>50 GB • 6 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 70,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
+          <div class="plan-option pro-card" onclick="requestPRO('pro_2m_60gb')"><h3> PRO 60</h3><p>60 GB • 10 Mbps</p><p style="font-size:18px;font-weight:bold;color:var(--warning)">UGX 95,000</p><button class="btn" style="margin-top:12px;background:var(--warning);color:#0b1120">Request Access</button></div>
         </div>
-        <h3 style="margin:24px 0 12px;color:var(--text)">📅 Annual & Special (1 Year)</h3>
+        <h3 style="margin:24px 0 12px;color:var(--text)"> Annual & Special (1 Year)</h3>
         <div class="duration-grid">
-          <div class="plan-option annual-card" onclick="requestPRO('annual_250gb')"><h3>🟧 Annual 250</h3><p>250 GB • 1 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 300,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
-          <div class="plan-option annual-card" onclick="requestPRO('annual_450gb')"><h3>🟧 Annual 450</h3><p>450 GB • 2 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 400,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
-          <div class="plan-option annual-card" onclick="requestPRO('annual_unlimited')"><h3>🟣 Annual Unlimited</h3><p>Unlimited Data • 3 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 600,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
+          <div class="plan-option annual-card" onclick="requestPRO('annual_250gb')"><h3> Annual 250</h3><p>250 GB • 1 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 300,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
+          <div class="plan-option annual-card" onclick="requestPRO('annual_450gb')"><h3> Annual 450</h3><p>450 GB • 2 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 400,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
+          <div class="plan-option annual-card" onclick="requestPRO('annual_unlimited')"><h3> Annual Unlimited</h3><p>Unlimited Data • 3 Mbps</p><p style="font-size:18px;font-weight:bold;color:#8b5cf6">UGX 600,000</p><button class="btn" style="margin-top:12px;background:#8b5cf6;color:white">Request Access</button></div>
         </div>
       </div>
 
       <!-- ====== INFO CARDS ====== -->
       <div class="info-card">
-        <p>🦅 <strong>RAVEN NETOPS VPN</strong> — POWERED BY RAVEN NETOPS LTD. DEVELOPED IN EAST AFRICA.</p>
+        <p>🦅 <strong>RAVEN NET-OPS</strong> — POWERED BY RAVEN NETOPS LTD. DEVELOPED IN EAST AFRICA.</p>
       </div>
 
       <div class="info-card">
-        <p>🆕 <strong>v1.0.1</strong> — Auto-Switch Test/Live Mode, E.164 Phone Support, Rune Language Preview.</p>
+        <p> <strong>v1.0.1</strong> — Auto-Switch Test/Live Mode, E.164 Phone Support, Rune Language Preview.</p>
       </div>
 
       <div class="info-card">
-        <p>🚀 <strong>COMING SOON:</strong> Loyalty Program, Referrals, Interactive Rune Playground, and more!</p>
+        <p> <strong>COMING SOON:</strong> Loyalty Program, Referrals, Interactive Rune Playground, and more!</p>
       </div>
 
       <div class="info-card">
@@ -280,8 +294,8 @@
           <button onclick="refreshConnection()" style="margin-top:16px; width:100%; padding:10px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">🔄 Refresh Status</button>
         </div>
         <div id="connectionNotActive" style="text-align:center; padding:24px 16px; color:var(--text-muted);">
-          <p style="margin-bottom:16px;">Connect via the Raven NetOps VPN app to see your status here.</p>
-          <a href="https://your-server.com/raven-vpn.apk" class="btn btn-primary" style="max-width:200px;"> Download App</a>
+          <p style="margin-bottom:16px;">Connect via the RAVEN NET-OPS app to see your status here.</p>
+          <a href="https://github.com/Ravenj-png/raven-internet/releases/download/v1.0.0/app-release.apk" class="btn btn-primary" style="max-width:200px;" target="_blank">Download App</a>
         </div>
         <div style="margin-top:24px; padding:12px; background:rgba(16,185,129,0.1); border-radius:8px; border-left:3px solid var(--success);">
           <p style="font-size:13px; color:var(--text-muted); margin:0;">🔒 Your connection data is encrypted and never logged.</p>
@@ -342,8 +356,8 @@
 <!-- PWA Install Button -->
 <div id="installContainer">
   <button id="installBtn" onclick="installPWA()">
-    <span>📥</span>
-    <span>Install Raven VPN</span>
+    <span></span>
+    <span>Install RAVEN NET-OPS</span>
   </button>
 </div>
 
@@ -510,7 +524,7 @@ async function initiatePayment() {
 // 📋 COPY & SAVE
 function copyCode() { const c = document.getElementById('voucherCode').textContent.trim(); const f = document.getElementById('copyFeedback'); if (navigator.clipboard) { navigator.clipboard.writeText(c).then(() => showCopy(f)).catch(() => legCopy(c, f)) } else { legCopy(c, f) } }
 function legCopy(t, f) { const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showCopy(f) } catch { f.textContent = ' Copy failed. Select manually.'; f.style.color = 'var(--danger)' } document.body.removeChild(ta) }
-function showCopy(f) { f.textContent = '✅ Code copied! Paste in Raven NetOps VPN app'; f.style.color = 'var(--success)'; setTimeout(() => f.textContent = '', 4000) }
+function showCopy(f) { f.textContent = 'Code copied! Paste in RAVEN NET-OPS app'; f.style.color = 'var(--success)'; setTimeout(() => f.textContent = '', 4000) }
 
 function onPaymentSuccess(c, d, dl) { 
   voucherCode = c; 
