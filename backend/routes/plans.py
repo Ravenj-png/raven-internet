@@ -4,7 +4,10 @@ from models import Transaction, Voucher, AuditLog
 from utils.serializers import tx_to_dict
 from utils.transactions import safe_external_call, validate_idempotency
 from config import Config, is_test_mode
-import datetime as dt, random, string
+from utils.constants import PLANS
+import datetime as dt
+import random
+import string
 
 plans_bp = Blueprint('plans', __name__, url_prefix='/api/v1')
 
@@ -17,7 +20,7 @@ def purchase_plan():
     amount = data.get('amount', 0)
     idem_key = request.headers.get('X-Idempotency-Key')
 
-    # 1. IDEMPOTENCY CHECK (BEFORE ANY DB WRITE)
+    # 1. IDEMPOTENCY CHECK
     dup_txn, dup_status = validate_idempotency(idem_key)
     if dup_txn:
         return jsonify({
@@ -29,7 +32,7 @@ def purchase_plan():
             'request_id': getattr(g, 'request_id', None)
         }), 200
 
-    # 2. CREATE PENDING RECORD + COMMIT IMMEDIATELY
+    # 2. CREATE PENDING RECORD
     txn = Transaction(
         phone_number=phone, plan_id=plan_id, amount=amount,
         status='PENDING', idempotency_key=idem_key,
@@ -46,20 +49,23 @@ def purchase_plan():
         result = safe_external_call('pesapal', data, timeout=5)
 
     # 4. STATE TRANSITION → FINALITY
+    plan = PLANS.get(txn.plan_id)
+    plan_hours = plan['hours'] if plan else 24  # ✅ Get correct duration
+
     if result['status'] == 'SUCCESS':
         txn.status = 'SUCCESS'
-        txn.voucher_code = generate_voucher_code(txn.plan_id, txn.is_test)
+        txn.voucher_code = generate_voucher_code(txn.plan_id, txn.is_test, plan_hours)
     elif result['status'] == 'TIMEOUT':
-        txn.status = 'PENDING_REVIEW'  # ✅ Critical state
+        txn.status = 'PENDING_REVIEW'
     else:
         txn.status = 'FAILED'
-        
+
     db.session.commit()
-    
-    # 5. AUDIT LOG (✅ FIXED: extra_data instead of metadata)
+
+    # 5. AUDIT LOG
     log_action('purchase_' + ('test' if is_test_mode() else 'live'), phone, plan_id, status=txn.status)
 
-    # 6. RETURN CLEAN JSON
+    # 6. RETURN JSON
     return jsonify({
         'success': txn.status == 'SUCCESS',
         'mode': 'TEST' if is_test_mode() else 'LIVE',
@@ -69,28 +75,32 @@ def purchase_plan():
         'request_id': getattr(g, 'request_id', None)
     }), 200
 
-def generate_voucher_code(plan_id, is_test):
-    """Atomic voucher generation"""
+def generate_voucher_code(plan_id, is_test, hours):
+    """Atomic voucher generation with correct expiry based on plan"""
     prefix = "TEST-" if is_test else "RVN-"
     max_attempts = 10
     for _ in range(max_attempts):
         code = prefix + ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
         if not Voucher.query.filter_by(code=code).first():
-            v = Voucher(code=code, plan_id=plan_id, is_test=is_test,
-                        expires_at=dt.datetime.utcnow() + dt.timedelta(hours=24))
+            v = Voucher(
+                code=code,
+                plan_id=plan_id,
+                is_test=is_test,
+                expires_at=dt.datetime.utcnow() + dt.timedelta(hours=hours)  # ✅ CORRECT expiry
+            )
             db.session.add(v)
             db.session.commit()
             return code
     raise Exception("Failed to generate unique voucher code")
 
 def log_action(action_type, phone, plan_id, **kwargs):
-    """Simple audit logger - ✅ FIXED: extra_data instead of metadata"""
+    """Simple audit logger"""
     try:
         log = AuditLog(
             action=action_type,
             phone=phone,
             plan_id=plan_id,
-            extra_data=kwargs,  # ✅ RENAMED from 'metadata' (reserved word)
+            extra_data=kwargs,
             timestamp=dt.datetime.utcnow()
         )
         db.session.add(log)
